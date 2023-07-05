@@ -12,7 +12,7 @@ const bot = mineflayer.createBot({
         username: process.argv[4] ? process.argv[4] : 'C',
         password: process.argv[5] ? process.argv[5] : password,
     })
-
+app.use(express.static(__dirname))
 // --------------- Ф У Н К Ц И И  -----------------//
 function login() {
     bot.chat(`/register ${process.argv[5]} ${process.argv[5]}  `)
