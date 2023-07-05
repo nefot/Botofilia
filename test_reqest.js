@@ -99,4 +99,4 @@ bot.on('whisper', function (username, message, translate, jsonMsg, matches) {
 
 app.listen(2828, () => console.log("Сервер запущен..."));
 bot.loadPlugin(pathfinder)
-bot.once("spawn", login
+bot.once("spawn", login)
