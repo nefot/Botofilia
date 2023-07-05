@@ -1,5 +1,5 @@
 html {
-    background-color: black;
+    background-color: #212121;
     color: #66ff00;
     margin: 50px;
     font-family: 'Press Start 2P', cursive;
@@ -7,14 +7,14 @@ html {
 }
 
 hr {
-    color: black;
-    background-color: black;
+    color: #212121;
+    background-color: #212121;
     border-style: none;
 }
 
 input {
     border-color: #66ff00;
-    background-color: black;
+    background-color: #212121;
     color: #66ff00;
     font-family: 'Press Start 2P', cursive;
     padding: 5px;
