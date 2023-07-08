@@ -107,7 +107,7 @@ app.post("/", urlencodedParser, function (request, response) {
 });
 bot.on('health', () => {
     if (bot.food === 20) bot.autoEat.disable()
-    else bot.autoEat.enable
+    else bot.autoEat.enable()
 })
 bot.on('chat', async (username, message) => {
     console.log(`<${username}> ${message}`)
@@ -140,8 +140,8 @@ bot.on('whisper', function (username, message, translate, jsonMsg, matches) {
 })
 
 app.listen(process.argv[6], () => console.log("Сервер запущен..."));
+bot.loadPlugin(autoeat)
 
 bot.loadPlugin(pathfinder)
-bot.loadPlugin(autoeat)
 bot.once("spawn", login)
 
