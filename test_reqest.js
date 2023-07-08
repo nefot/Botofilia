@@ -11,8 +11,10 @@ const bot = mineflayer.createBot({
     // port: process.argv[3] ? process.argv[3] : NaN,
     username: process.argv[4] ? process.argv[4] : 'C',
     password: process.argv[5] ? process.argv[5] : password,
+
 })
 app.use(express.static(__dirname))
+const autoeat = require('mineflayer-auto-eat').plugin
 
 // --------------- Ф У Н К Ц И И  -----------------//
 function login() {
@@ -22,6 +24,11 @@ function login() {
     const mcData = require('minecraft-data')(bot.version)
     const defaultMove = new Movements(bot, mcData)
     bot.pathfinder.setMovements(defaultMove)
+
+    bot.autoEat.options.priority = 'foodPoints'
+    bot.autoEat.options.startAt = 14
+
+
 }
 
 function come(target) {
@@ -90,7 +97,7 @@ app.post("/", urlencodedParser, function (request, response) {
     if (!request.body) return response.sendStatus(400);
     if (request.body.mes !== undefined) {
         if (request.body.name === bot.username) {
-            if (request.body.mes.split('')[0] === '/') {
+            if (request.body.mes.split('')[0] === '$') {
                 examination(request.body.name, request.body.mes.split('').slice(1).join(''))
             } else {
                 bot.chat(request.body.mes)
@@ -98,9 +105,28 @@ app.post("/", urlencodedParser, function (request, response) {
         }
     }
 });
+bot.on('health', () => {
+    if (bot.food === 20) bot.autoEat.disable()
+    else bot.autoEat.enable
+})
 bot.on('chat', async (username, message) => {
     console.log(`<${username}> ${message}`)
 })
+bot.on("death",async ()=>{
+    console.log(clc.red("СМЕРТЬ"))
+    stop()
+})
+
+bot.on('autoeat_started', (item, offhand) => {
+    console.log(`Eating ${item.name} in ${offhand ? 'offhand' : 'hand'}`)
+})
+
+bot.on('autoeat_finished', (item, offhand) => {
+    console.log(`Finished eating ${item.name} in ${offhand ? 'offhand' : 'hand'}`)
+})
+
+bot.on('autoeat_error', console.error)
+
 bot.on('playerJoined', async (username) => {
     console.log(clc.yellow(`${username.displayName} присоеденился к игре`))
 })
@@ -109,9 +135,13 @@ bot.on('playerLeft', async (username) => {
 })
 bot.on('whisper', function (username, message, translate, jsonMsg, matches) {
     examination(username, message)
+    console.log(clc.cyan(`<${username}> ${message}`))
 
 })
 
-app.listen(2828, () => console.log("Сервер запущен..."));
+app.listen(process.argv[6], () => console.log("Сервер запущен..."));
+
 bot.loadPlugin(pathfinder)
+bot.loadPlugin(autoeat)
 bot.once("spawn", login)
+
