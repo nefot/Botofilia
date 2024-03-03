@@ -67,10 +67,10 @@ function come(target) {
  * Функция для остановки движения
  * @param {string} target - Цель, перед которой остановится бот
  */
-// function stop(target) {
-//     bot.pathfinder.setGoal(null, 1);
-//     bot.chat(`/msg ${target.displayName} остановился`);
-// }
+function stop(target) {
+    bot.pathfinder.setGoal(null, 1);
+    bot.chat(`/msg ${target.displayName} остановился`);
+}
 
 /**
  * Функция для перемещения к указанным координатам

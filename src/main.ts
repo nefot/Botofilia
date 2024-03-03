@@ -8,6 +8,7 @@ import clc from "cli-color";
 
 import net from "net";
 
+
 class MinecraftBot {
 
 
@@ -21,29 +22,41 @@ class MinecraftBot {
     private controller_host: string;
 
 
-    constructor(username: string, password: string, host: string, options?: any) {
+    constructor(username: string, password: string, host: string, port: string | number, options?: any) {
         this.bot = mineflayer.createBot({
             username: username,
             password: password,
             host: host,
-
+            port: port,
             ...options,
         });
         this.movementController = new MovementController(this.bot);
-        this.chat = new ChatController(this.bot, password, username);
+        this.chat = new ChatController(this.bot);
         // this.eventController = new EventController(this.bot);
         this.username = username;
         this.password = password;
-
 
 
         this.controller_port = 7777;
         this.controller_host = 'localhost';
 
 
-
-
         this.setupEvents()
+    }
+
+    private checkBotReady() {
+        return this.bot && typeof this.bot.chat === 'function';
+    }
+
+    public login() {
+        if (!this.checkBotReady()) {
+            console.log('Bot is not ready to log in');
+            return;
+        }
+
+        this.bot.chat(`/login ${this.password}`);
+        console.log(`Бот ${this.username} вошел в игру`);
+
     }
 
     private run_server_controller() {
@@ -72,31 +85,48 @@ class MinecraftBot {
         });
 
     }
-    public handleChatMessage(message: string): void {
-        message = message.toLowerCase().split(" ")[0]
+
+    public handleChatMessage(username: string, message: string): void {
+        // console.log(message)
+        let mes = []
+        mes = (message.toLowerCase()).split(" ")
+        message = (message.toLowerCase()).split(" ")[0]
+
+        // console.log(mes)
         switch (message) {
             case 'goto':
-                this.movementController.gotoBlock(message[1],message[2],message[3],'');
+                this.chat.sendDirectMessage(username,this.movementController.gotoBlock(mes[1], mes[2], mes[3], username));
                 break;
             case 'come':
-                this.movementController.comeToPlayer();
+                this.chat.sendDirectMessage(username, this.movementController.comeToPlayer(username))
                 break;
+
+            case 'stop':
+                this.chat.sendDirectMessage(username, this.movementController.stopBot(username));
+
+
             default:
                 // Действие по умолчанию для неизвестных сообщений
                 break;
         }
     }
+
     private setupEvents() {
+        this.bot.on('chat', (username, message) => {
+            // this.handleChatMessage(username, message);
+            // console.log((` ${this.chat.getCurrentDateTime()} <${username}> ${message}`));
+        });
 
         this.bot.on('spawn', () => {
             console.log('Bot spawned!');
         });
-
         this.bot.on('playerJoined', (player) => {
+
             console.log(`${player.username} присоединился к игре`);
+
         });
 
-        this.bot.on("death",async ()=>{
+        this.bot.on("death", async () => {
             console.log(("СМЕРТЬ"))
             // stop()
         })
@@ -105,13 +135,23 @@ class MinecraftBot {
         });
 
         this.bot.on('whisper', (username, message, translate, jsonMsg, matches) => {
-            this.chat.handleChatMessage(username, message);
+            this.handleChatMessage(username, message);
             console.log((` ${this.chat.getCurrentDateTime()} <${username}> ${message}`));
         });
+        this.bot.once('spawn', () => {
+            this.login()
+
+        });
+
+            this.bot.on('goal_reached', ()=>{
+                console.log('дошел')
+            })
+
     }
+
     // Add other methods as need edt
 }
 
 
 // Пример использования:
-const bot = new MinecraftBot(process.argv[2], process.argv[3], process.argv[4], process.argv[5] ? process.argv[5] : NaN );
+const bot = new MinecraftBot(process.argv[2], process.argv[3], process.argv[4], process.argv[5] ? process.argv[5] : NaN);

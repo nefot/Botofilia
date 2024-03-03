@@ -23,7 +23,7 @@ console.log(names, names.length);
 
 let scripts = ['npm run test'];
 for (let i = 0; i < names.length; i++) {
-    scripts.push (`node main.js 77.235.121.114 000 ${names[i].replace(/\r/g, '')} 0303708000`); // Добавляем текущее имя к уже сохранённым
+    scripts.push (`node dist/main.js ${names[i].replace(/\r/g, '')} 0303708000 127.0.0.1 8000`); // Добавляем текущее имя к уже сохранённым
 }
 // Список всех скриптов для запуска
 
