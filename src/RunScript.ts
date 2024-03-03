@@ -79,7 +79,7 @@ function generateNamesAndAppendToFile(): void {
     }
 }
 
-// generateNamesAndAppendToFile();
+generateNamesAndAppendToFile();
 
 
 console.log(Setting.names, Setting.names.length);
