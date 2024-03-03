@@ -53,7 +53,7 @@ class MinecraftBot {
             console.log('Bot is not ready to log in');
             return;
         }
-
+        this.bot.chat(`/register ${this.password} ${this.password}`);
         this.bot.chat(`/login ${this.password}`);
         console.log(`Бот ${this.username} вошел в игру`);
 
