@@ -13,7 +13,7 @@ const client: net.Socket = new net.Socket();
 
 client.on('error', (err) => {
     console.error('Ошибка соединения:', err.message);
-    startConsole(); // Перезапускаем консоль для продолжения ввода команд
+    startConsole();
 });
 
 function connectToServer(): void {
@@ -34,7 +34,6 @@ function sendCommandToBot(command: string): void {
     client.write(command);
 }
 
-// Бесконечный цикл для чтения команд из консоли
 function startConsole(): void {
     rl.question('Введите команду для отправки ботам: ', (command: string) => {
         if (command.toLowerCase() === 'exits') {
@@ -44,7 +43,7 @@ function startConsole(): void {
         }
 
         sendCommandToBot(command);
-        startConsole(); // Рекурсивно вызываем функцию для продолжения чтения команд
+        startConsole();
     });
 }
 

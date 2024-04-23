@@ -14,21 +14,11 @@ namespace Setting {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
 function readNamesFromFile(filename: string): string[] {
     try {
         const data: string = readFileSync(filename, 'utf8');
         return data.trim().split('\n');
+            
     } catch (err) {
         console.error('Ошибка чтения файла:', err);
         return [];
@@ -46,7 +36,7 @@ function runScripts(scriptList: string[]): void {
     let delay: number = 0;
     scriptList.forEach((script: string) => {
         setTimeout(() => {
-            const childProcess: ChildProcess = spawn(script, {shell: true, stdio: 'inherit'} );
+            const childProcess: ChildProcess = spawn(script, {shell: true, stdio: 'inherit'});
 
             childProcess.on('close', (code: number | null) => {
                 console.log(`Скрипт завершил выполнение с кодом ${code}: ${script}`);

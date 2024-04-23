@@ -1,5 +1,5 @@
 import * as mineflayer from 'mineflayer';
-// import {BlockCleaner} from "./BlockCleaner";
+import {BlockClearer} from "./BlockCleaner";
 import {MovementController} from './MovementController';
 import {ChatController} from './ChatController';
 // import {EventController} from './EventController';
@@ -7,19 +7,24 @@ import chalk from 'chalk';
 import clc from "cli-color";
 
 import net from "net";
+import path from 'path';
 
 
 class MinecraftBot {
 
 
-    private readonly bot: mineflayer.Bot;
+    public bot: mineflayer.Bot;
     private readonly password: string;
     private readonly username: string;
     private movementController: MovementController;
     private chat: ChatController;
+
+
+    private blockCleaner: BlockClearer;
     // private eventController: EventController;
     private controller_port: number;
     private controller_host: string;
+    private logFolderPath: any;
 
 
     constructor(username: string, password: string, host: string, port: string | number, options?: any) {
@@ -30,12 +35,13 @@ class MinecraftBot {
             port: port,
             ...options,
         });
+        this.logFolderPath = `${__dirname},/, logs`;
         this.movementController = new MovementController(this.bot);
-        this.chat = new ChatController(this.bot);
+        this.chat = new ChatController(this.bot,this.logFolderPath);
         // this.eventController = new EventController(this.bot);
         this.username = username;
         this.password = password;
-
+        this.blockCleaner = new BlockClearer(this.bot)
 
         this.controller_port = 7777;
         this.controller_host = 'localhost';
@@ -95,7 +101,7 @@ class MinecraftBot {
         // console.log(mes)
         switch (message) {
             case 'goto':
-                this.chat.sendDirectMessage(username,this.movementController.gotoBlock(mes[1], mes[2], mes[3], username));
+                this.chat.sendDirectMessage(username, this.movementController.gotoBlock(mes[1], mes[2], mes[3], username));
                 break;
             case 'come':
                 this.chat.sendDirectMessage(username, this.movementController.comeToPlayer(username))
@@ -103,6 +109,23 @@ class MinecraftBot {
 
             case 'stop':
                 this.chat.sendDirectMessage(username, this.movementController.stopBot(username));
+                break;
+
+            case 'echo':
+                let mes1: string = mes.slice(1).join(" ");
+
+
+
+
+                this.chat.sendMessage(mes1)
+                break;
+
+
+
+            case 'mine':
+                console.log('mine')
+                this.chat.sendDirectMessage(username, this.blockCleaner.clearRectangle(0, -61, 0, 5, -6, 30));
+                break;
 
 
             default:
@@ -113,7 +136,7 @@ class MinecraftBot {
 
     private setupEvents() {
         this.bot.on('chat', (username, message) => {
-            // this.handleChatMessage(username, message);
+            // this.ёhandleChatMessage(username, message);
             // console.log((` ${this.chat.getCurrentDateTime()} <${username}> ${message}`));
         });
 
@@ -143,9 +166,9 @@ class MinecraftBot {
 
         });
 
-            this.bot.on('goal_reached', ()=>{
-                console.log('дошел')
-            })
+        this.bot.on('goal_reached', () => {
+            console.log('дошел')
+        })
 
     }
 

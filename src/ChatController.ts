@@ -2,19 +2,23 @@ import * as mineflayer from 'mineflayer';
 import * as fs from 'fs';
 import chalk from 'chalk';
 
+import path from 'path';
 
 class ChatController {
-    private readonly bot: mineflayer.Bot;
+    private readonly bot: mineflayer.Bot; // тип mineflayer.Bot заменен на any
+    private readonly logFolderPath: string; // Путь к папке с логами
 
 
-    constructor(bot: mineflayer.Bot) {
+    constructor(bot: mineflayer.Bot, logFolderPath: string) {
         this.bot = bot;
+        this.logFolderPath = logFolderPath;
         this.setupEventHandlers();
     }
 
     private setupEventHandlers() {
         this.bot.on('chat', (username, message) => {
             console.log((`${this.getCurrentDateTime()} <${username}> ${message}`));
+            this.saveToLog((`${this.getCurrentDateTime()} <${username}> ${message}`));
             // console.log(typeof username);
 
         });
@@ -22,8 +26,28 @@ class ChatController {
 
         // Добавьте другие обработчики событий по мере необходимости
     }
+    public saveToLog(text: string): void {
+        const currentDate = new Date();
+        let logFolder:string =''
+        logFolder = logFolder.concat(this.logFolderPath, currentDate.getFullYear().toString(), (currentDate.getMonth() + 1).toString(), currentDate.getDate().toString());
 
-    // Add other methods as need edt
+        // Создание папки, если она не существует
+        if (!fs.existsSync(logFolder)) {
+            fs.mkdirSync(logFolder, { recursive: true });
+        }
+        let logFileName:string = ''
+        logFileName = logFileName.concat(logFolder, 'log.txt');
+
+        // Добавление текста в лог
+        fs.appendFile(logFileName, `${currentDate.toLocaleString()}: ${text}\n`, (err) => {
+            if (err) {
+                console.error('Произошла ошибка при записи в лог:', err);
+            } else {
+                console.log('Текст успешно сохранен в логе.');
+            }
+        });
+    }
+
 
     public sendMessage(message: string) {
         if (this.bot && this.bot.chat) {

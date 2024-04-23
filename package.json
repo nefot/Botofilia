@@ -4,11 +4,31 @@
   "description": "none",
   "main": "test_reqest.js",
   "scripts": {
-    "test2": "node dist/main.js 77.235.121.114 nefoter1023 0303708000",
+    "test2": "node dist/main.js 77.235.121.114 ZombieMummy 0303708000",
     "controler": "node dist/Controller.js",
     "build": "tsc",
+
+
+
     "test": " node dist/main.js archive 0303708000 77.235.121.114",
-    "test5": " node dist/main.js nefotert1 0303708000 77.235.121.114",
+    "test519": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
+    "test549": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
+    "1": " node dist/main.js Borekci 0303708000 77.235.121.114",
+    "2": " node dist/main.js Killer_IV 0303708000 77.235.121.114",
+    "23": " node dist/main.js ItsMeet 0303708000 77.235.121.114",
+    "234": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
+    "235": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
+    "236": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
+    "237": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
+    "238": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
+
+
+
+
+
+    "test59": " node dist/main.js WilsonXilson 0303708000 77.235.121.114",
+
+    "test5": " node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "runscript": "node dist/RunScript.js",
     "stest132": "node dist/main.js ",
     "start": "npm-run-all -p -c wait-20 test test1 test2 test3 test4 test5 test6 test7 test8 test9 test10 test11 test12 test53 test36 test73 test83 test93 test130 test131 test132 stest513 stest316 stest713 stest813 stest923 stest1230 stest1231 stest1232 stest523 stest326 stest733 stest833 stest933 stest1330 stest1331 stest1332 stest533 stest336 stest7453 stest843 stest943 stest1430 stest1431 stest1432 stest543 stest346 stest74553 stest8553 stest9553 stest1530 stest15231 stest15232 stest553 stest356 stest753 stest853 stest953 stest1520 stest151 stest152 stest55 stest35 stest75 stest85 stest95 stest150 stest1531 stest1532 stest53 stest36 stest73 stest83 stest93 stest130 stest131 stest132",
@@ -25,6 +45,7 @@
     "mineflayer-pathfinder": "^2.4.5",
     "npm-run-all": "^4.1.5",
     "terminate": "^2.6.1",
+    "vec3": "^0.1.10",
     "websocket": "^1.0.34"
   },
   "devDependencies": {

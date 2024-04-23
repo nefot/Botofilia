@@ -1,15 +1,13 @@
 import * as mineflayer from 'mineflayer';
-import clc from "cli-color";
 import {ChatController} from './ChatController';
-import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
-const { GoalNear, GoalBlock, GoalFollow } = goals;
+import {pathfinder, Movements, goals} from 'mineflayer-pathfinder';
+
+const {GoalNear, GoalFollow} = goals;
 
 
 class MovementController {
     private bot: mineflayer.Bot;
     private chat: ChatController;
-
-
 
 
     constructor(bot: mineflayer.Bot) {
@@ -19,15 +17,13 @@ class MovementController {
 
     }
 
-    public  gotoBlock(x: string, y: string, z: string, username:string) {
-        console.log(x,y,z)
-        const _x:number = Number(x)
-        const _y:number = Number(y);
-        const _z:number  = Number(z);
+    public gotoBlock(x: string, y: string, z: string, username: string) {
+        console.log(x, y, z)
+        const _x: number = Number(x)
+        const _y: number = Number(y);
+        const _z: number = Number(z);
         const _target = this.bot.players[username] ? this.bot.players[username].entity : null
-        // Реализация перемещения к игроку
         console.log('Bot is going to player...');
-        // Дополнительные действия, например, перемещение бота к игроку
 
 
         let path;
@@ -47,7 +43,8 @@ class MovementController {
         }
 
     }
-    public stopBot(username:string){
+
+    public stopBot(username: string) {
         this.bot.pathfinder.setGoal(null);
         this.chat.sendDirectMessage(username, `I stopping`)
         return `I stopping`
@@ -71,8 +68,8 @@ class MovementController {
         }
     }
 
-    public events(){
-        this.bot.on('goal_reached', ()=>{
+    public events() {
+        this.bot.on('goal_reached', () => {
             console.log('дошел')
         })
     }
