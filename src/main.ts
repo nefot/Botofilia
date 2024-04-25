@@ -1,5 +1,4 @@
 import * as mineflayer from 'mineflayer';
-import {BlockClearer} from './BlockCleaner';
 import {MovementController} from './MovementController';
 import {ChatController} from './ChatController';
 import net from 'net';
@@ -11,7 +10,6 @@ class MinecraftBot {
     private readonly username: string;
     private movementController: MovementController;
     private chat: ChatController;
-    private blockCleaner: BlockClearer;
     private controller_port: number;
     private controller_host: string;
     private logFolderPath: string;
@@ -38,7 +36,7 @@ class MinecraftBot {
         this.logFolderPath = `${__dirname},/, logs`;
         this.movementController = new MovementController(this.bot);
         this.chat = new ChatController(this.bot, this.logFolderPath, this.ch);
-        this.blockCleaner = new BlockClearer(this.bot);
+
         this.controller_port = 7777;
         this.controller_host = 'localhost';
         this.setupEvents();
@@ -65,7 +63,6 @@ class MinecraftBot {
             socket.on('data', (data: Buffer) => {
                 const command: string = data.toString().trim();
                 console.log('Received command:', command);
-                // Handle command here
             });
 
             socket.on('end', () => {
@@ -102,17 +99,14 @@ class MinecraftBot {
                 break;
             case 'mine':
                 console.log('mine');
-                this.chat.sendDirectMessage(username, this.blockCleaner.clearRectangle(0, -61, 0, 5, -6, 30));
                 break;
             default:
-                // Default action for unknown messages
                 break;
         }
     }
 
     private setupEvents(): void {
         this.bot.on('chat', (username, message) => {
-            // this.handleChatMessage(username, message);
             console.log(`${this.chat.getCurrentDateTime()} <${username}> ${message}`);
             console.log(this.ch)
             if (this.ch) {
@@ -121,7 +115,6 @@ class MinecraftBot {
         });
 
         this.bot.on('spawn', () => {
-            // console.log('Bot spawned!');
         });
 
         this.bot.on('playerJoined', (player) => {
@@ -130,7 +123,6 @@ class MinecraftBot {
 
         this.bot.on('death', () => {
             console.log('DEATH');
-            // stop()
         });
 
         this.bot.on('playerLeft', (username) => {
@@ -138,9 +130,7 @@ class MinecraftBot {
         });
 
         this.bot.on('whisper', (username, message) => {
-            this.handleChatMessage(username, message);
-            // console.log(`${this.chat.getCurrentDateTime()} <${username}> ${message}`);
-        });
+            this.handleChatMessage(username, message);});
 
         this.bot.once('spawn', () => {
             this.login();
@@ -156,6 +146,6 @@ const bot = new MinecraftBot(
     process.argv[2],
     process.argv[3],
     process.argv[4],
-    parseInt(process.argv[5]), // Parse as number
-    process.argv[6] == "true" // Pass boolean directly
+    parseInt(process.argv[5]),
+    process.argv[6] == "true"
 );
