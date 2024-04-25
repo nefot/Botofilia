@@ -13,7 +13,7 @@ class MovementController {
     constructor(bot: mineflayer.Bot) {
         this.bot = bot;
         bot.loadPlugin(pathfinder);
-        this.chat = new ChatController(this.bot);
+        this.chat = new ChatController(this.bot, '');
 
     }
 
