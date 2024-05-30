@@ -19,7 +19,7 @@ class ChatController {
         const logFileName = `${logFolder}/log.txt`;
 
         if (!fs.existsSync(logFolder)) {
-            fs.mkdirSync(logFolder, { recursive: true });
+            fs.mkdirSync(logFolder, {recursive: true});
         }
 
         fs.appendFile(logFileName, `${text}\n`, (err) => {
@@ -49,4 +49,27 @@ class ChatController {
     }
 }
 
-export { ChatController };
+
+// class ChatMessage {
+//     private strikethrough: undefined;
+//     constructor() {
+//         this.json = {};
+//         this.warn = '';
+//         this.translate = '';
+//         this.with = '';
+//         this.bold = undefined;
+//         this.italic = undefined;
+//         this.underlined = undefined;
+//         this.strikethrough = undefined;
+//         this.obfuscated = undefined;
+//         this.color = undefined;
+//
+//     }
+// }
+//
+//
+// function message_handler(message: object) {
+//
+// }
+
+export {ChatController};

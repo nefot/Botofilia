@@ -10,10 +10,8 @@ class MinecraftBot {
     private readonly username: string;
     private movementController: MovementController;
     private chat: ChatController;
-    private controller_port: number;
-    private controller_host: string;
-    private logFolderPath: string;
-    private ch: boolean;
+    private readonly logFolderPath: string;
+    private readonly ch: boolean;
 
     constructor(
         username: string,
@@ -33,12 +31,10 @@ class MinecraftBot {
             port: port,
             ...options,
         });
+
         this.logFolderPath = `${__dirname},/, logs`;
         this.movementController = new MovementController(this.bot);
         this.chat = new ChatController(this.bot, this.logFolderPath, this.ch);
-
-        this.controller_port = 7777;
-        this.controller_host = 'localhost';
         this.setupEvents();
     }
 
@@ -54,29 +50,6 @@ class MinecraftBot {
         this.bot.chat(`/register ${this.password} ${this.password}`);
         this.bot.chat(`/login ${this.password}`);
         console.log((`Bot ${this.username} logged into the game`).blue);
-    }
-
-    private runServerController(): void {
-        const server: net.Server = net.createServer((socket: net.Socket) => {
-            console.log('Client connected');
-
-            socket.on('data', (data: Buffer) => {
-                const command: string = data.toString().trim();
-                console.log('Received command:', command);
-            });
-
-            socket.on('end', () => {
-                console.log('Client disconnected');
-            });
-        });
-
-        server.on('error', (err: NodeJS.ErrnoException) => {
-            console.error('Server error:', err);
-        });
-
-        server.listen(this.controller_port, () => {
-            console.log(`Server listening on port ${this.controller_port}`);
-        });
     }
 
     public handleChatMessage(username: string, message: string): void {
@@ -100,15 +73,28 @@ class MinecraftBot {
             case 'mine':
                 console.log('mine');
                 break;
+
+            case 'health':
+                this.health(username)
+                break;
             default:
                 break;
         }
     }
+    private health(target:string) {
+        this.bot.chat(`/msg ${target} здоровье:${bot.health} насыщение:${this.bot.food} позиция ${this.bot.entity.position}`);
+        console.log(
+           (`  здоровье:${ this.bot.health} `).red,
+            (`насыщение:${ this.bot.food} `).yellow,
+            (`позиция  x: ${ this.bot.entity.position.x} y: ${ this.bot.entity.position.y} z: ${ this.bot.entity.position.z} `).blue
+        );
+    }
+
 
     private setupEvents(): void {
         this.bot.on('chat', (username, message) => {
             console.log(`${this.chat.getCurrentDateTime()} <${username}> ${message}`);
-            console.log(this.ch)
+            // console.log(this.ch)
             if (this.ch) {
                 this.chat.saveToLog((`${this.chat.getCurrentDateTime()} <${username}> ${message}`));
             }
@@ -124,13 +110,18 @@ class MinecraftBot {
         this.bot.on('death', () => {
             console.log('DEATH');
         });
+        this.bot.on('message', (jsonMsg, position) => {
+
+            // let message: object = jsonMsg;
+        });
 
         this.bot.on('playerLeft', (username) => {
             console.log((`${username.displayName} left the game`).red);
         });
 
         this.bot.on('whisper', (username, message) => {
-            this.handleChatMessage(username, message);});
+            this.handleChatMessage(username, message);
+        });
 
         this.bot.once('spawn', () => {
             this.login();
@@ -141,6 +132,7 @@ class MinecraftBot {
         });
     }
 }
+
 
 const bot = new MinecraftBot(
     process.argv[2],
