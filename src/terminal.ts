@@ -1,34 +1,13 @@
-import * as readline from 'readline';
+import { ChatHandler } from './main';
 
-export class Terminal {
-    private rl: readline.Interface;
+class Terminal {
+    private chatHandler: ChatHandler | null = null;
 
     constructor() {
-        this.rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            terminal: true
-        });
-
-        this.rl.on('line', (input: string) => {
-            this.handleInput(input);
-        });
-
-        this.rl.on('close', () => {
-            console.log('Terminal closed.');
-            process.exit(0);
-        });
     }
 
-    private handleInput(input: string): void {
-        console.log(`Received command: ${input}`);
-        // Process the command here
-        if (input === 'exit') {
-            this.rl.close();
-        } else {
-            // Handle other commands
-            console.log(`Command '${input}' is not recognized.`);
-        }
+    public setChatHandler(chatHandler: ChatHandler): void {
+        this.chatHandler = chatHandler;
     }
 
     public printMessage(message: string): void {
@@ -36,10 +15,18 @@ export class Terminal {
     }
 
     public prompt(): void {
-        this.rl.prompt();
+        process.stdin.resume(); // Ensure stdin is in read mode
+        process.stdout.write("> ");
+        process.stdin.on('data', (data) => {
+            const input = data.toString().trim();
+            if (this.chatHandler) {
+                this.chatHandler.handleChatMessage('console', input);
+            } else {
+                console.error("ChatHandler is not defined.");
+            }
+            process.stdout.write("> "); // Prompt again after handling input
+        });
     }
 }
 
-const terminal = new Terminal();
-terminal.printMessage('Welcome to the terminal!');
-terminal.prompt();
+export { Terminal };

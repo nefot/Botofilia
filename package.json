@@ -16,7 +16,7 @@
     "controler": "node dist/Controller.js",
     "build": "tsc",
     "test": "node dist/main.js archive 0303708000 127.0.0.1 8000",
-    "test519": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
+    "test519": " node archive SoulWarden 0303708000 77.235.121.114",
     "test549": " node dist/Colorize.js",
     "test59": " node dist/main.js WilsonXilson 0303708000 77.235.121.114",
     "test5": " node dist/main.js ZombieMummy 0303708000 77.235.121.114",

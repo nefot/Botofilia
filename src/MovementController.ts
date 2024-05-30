@@ -1,7 +1,7 @@
 import * as mineflayer from 'mineflayer';
 import { ChatController } from './ChatController';
 import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
-import {Terminal} from './terminal';
+import { Terminal } from './terminal';
 const { GoalNear, GoalFollow } = goals;
 
 class MovementController {
@@ -9,11 +9,11 @@ class MovementController {
     private chat: ChatController;
     private t: Terminal;
 
-    constructor(bot: mineflayer.Bot) {
+    constructor(bot: mineflayer.Bot, chat: ChatController, terminal: Terminal) {
         this.bot = bot;
-        bot.loadPlugin(pathfinder);
-        this.chat = new ChatController(this.bot, '');
-        this.t = new  Terminal()
+        this.chat = chat;
+        this.t = terminal;
+        this.bot.loadPlugin(pathfinder);
         this.setupEventHandlers();
     }
 
