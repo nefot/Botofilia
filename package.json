@@ -15,13 +15,17 @@
     "test2": "node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "controler": "node dist/Controller.js",
     "build": "tsc",
-    "test": "node dist/main.js archive 0303708000 77.235.121.114",
+    "test": "node dist/main.js archive 0303708000 127.0.0.1 8000",
     "test519": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
     "test549": " node dist/Colorize.js",
     "test59": " node dist/main.js WilsonXilson 0303708000 77.235.121.114",
     "test5": " node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "runscript": "node dist/RunScript.js",
-    "stest132": "node dist/main.js ",
+
+
+    "terminal": "node dist/terminal.js",
+
+
     "start": "npm-run-all -p -c wait-20 test test1 test2 test3 test4 test5 test6 test7 test8 test9 test10 test11 test12 test53 test36 test73 test83 test93 test130 test131 test132 stest513 stest316 stest713 stest813 stest923 stest1230 stest1231 stest1232 stest523 stest326 stest733 stest833 stest933 stest1330 stest1331 stest1332 stest533 stest336 stest7453 stest843 stest943 stest1430 stest1431 stest1432 stest543 stest346 stest74553 stest8553 stest9553 stest1530 stest15231 stest15232 stest553 stest356 stest753 stest853 stest953 stest1520 stest151 stest152 stest55 stest35 stest75 stest85 stest95 stest150 stest1531 stest1532 stest53 stest36 stest73 stest83 stest93 stest130 stest131 stest132",
     "wait-20": "ping 127.0.0.1 -n 21 > nul",
     "starst": "parallelshell \"npm run wait-20 && npm run test\" \"npm run wait-20 && npm run test1\" \"npm run wait-20 && npm run test2\" \"npm run wait-20 && npm run test3\" \"npm run wait-20 && npm run test4\" \"npm run wait-20 && npm run test5\" \"npm run wait-20 && npm run test6\" \"npm run wait-20 && npm run test7\" \"npm run wait-20 && npm run test8\" \"npm run wait-20 && npm run test9\" \"npm run wait-20 && npm run test10\" \"npm run wait-20 && npm run test11\" \"npm run wait-20 && npm run test12\" \"npm run wait-20 && npm run test53\" \"npm run wait-20 && npm run test36\" \"npm run wait-20 && npm run test73\" \"npm run wait-20 && npm run test83\" \"npm run wait-20 && npm run test93\" \"npm run wait-20 && npm run test130\" \"npm run wait-20 && npm run test131\" \"npm run wait-20 && npm run test132\""

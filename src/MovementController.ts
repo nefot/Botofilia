@@ -1,24 +1,25 @@
 import * as mineflayer from 'mineflayer';
 import { ChatController } from './ChatController';
 import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
-
+import {Terminal} from './terminal';
 const { GoalNear, GoalFollow } = goals;
 
 class MovementController {
     private bot: mineflayer.Bot;
     private chat: ChatController;
+    private t: Terminal;
 
     constructor(bot: mineflayer.Bot) {
         this.bot = bot;
         bot.loadPlugin(pathfinder);
         this.chat = new ChatController(this.bot, '');
-
+        this.t = new  Terminal()
         this.setupEventHandlers();
     }
 
     private setupEventHandlers(): void {
         this.bot.on('goal_reached', () => {
-            console.log('Goal reached');
+            this.t.printMessage('Goal reached');
             // Add any actions needed when the goal is reached
         });
     }
@@ -40,7 +41,7 @@ class MovementController {
         const defaultMove = new Movements(this.bot);
         const path = this.bot.pathfinder.getPathTo(defaultMove, new GoalNear(_x, _y, _z, 0));
 
-        console.log('Bot is going to coordinates:', _x, _y, _z);
+        this.t.printMessage(`Bot is going to coordinates:, ${_x}, ${_y}, ${_z}`);
         this.chat.sendDirectMessage(username, `Going to coordinates: ${_x} ${_y} ${_z}`);
         return `Going to coordinates: ${_x} ${_y} ${_z}`;
     }
@@ -49,7 +50,7 @@ class MovementController {
         this.bot.pathfinder.setGoal(null);
         const message = 'Stopping';
         this.chat.sendDirectMessage(username, message);
-        console.log(message);
+        this.t.printMessage(message);
         return message;
     }
 
@@ -60,7 +61,7 @@ class MovementController {
             this.bot.pathfinder.setGoal(new GoalFollow(_target, 1), true);
             const message = 'Coming to player';
             this.chat.sendDirectMessage(username, message);
-            console.log(message);
+            this.t.printMessage(message);
             return message;
         } else {
             const errorMessage = `Unable to find entity for player: ${username}`;
