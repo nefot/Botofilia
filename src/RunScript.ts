@@ -5,9 +5,9 @@ namespace Setting {
     export const filename = 'tt.txt';
     export const names = readNamesFromFile(filename);
     export let scripts: string[] = [];
-    export let host = '77.235.121.114';
+    export let host = '26.191.119.49';
     export let password = '0303708000';
-    export let port = 0;
+    export let port = 26565;
 }
 
 function readNamesFromFile(filename: string): string[] {
@@ -22,7 +22,7 @@ function readNamesFromFile(filename: string): string[] {
 
 function createScripts(): void {
     for (const name of Setting.names) {
-        Setting.scripts.push(`node dist/main.js ${name.replace(/\r/g, '')} ${Setting.password} ${Setting.host}`);
+        Setting.scripts.push(`node dist/main.js ${name.replace(/\r/g, '')} ${Setting.password} ${Setting.host} ${Setting.port}`);
     }
     console.log(Setting.scripts);
 }

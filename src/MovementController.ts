@@ -1,10 +1,28 @@
 import * as mineflayer from 'mineflayer';
-import { ChatController } from './ChatController';
-import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
-import { Terminal } from './terminal';
-const { GoalNear, GoalFollow } = goals;
+import {ChatController} from './ChatController';
+import {pathfinder, Movements, goals} from 'mineflayer-pathfinder';
+import {Terminal} from './terminal';
+
+const {GoalNear, GoalFollow} = goals;
 import * as fs from 'fs';
 import * as path from 'path';
+
+import movement from 'mineflayer-movement';
+
+
+
+
+
+
+
+
+interface IMovementController {
+    gotoBlock(x: number, y: number, z: number, username: string): string;
+    comeToPlayer(username: string): string;
+    stopBot(username: string): string;
+}
+
+
 
 
 
@@ -20,11 +38,17 @@ class MovementController {
     private logDir: string = path.join(__dirname, 'Death');
     private logFilePath: string = path.join(this.logDir, 'Death.log');
     private lastDamageSource: string | null = null;
+
+
+
     constructor(bot: mineflayer.Bot, chat: ChatController, terminal: Terminal) {
         this.bot = bot;
         this.chat = chat;
         this.t = terminal;
         this.bot.loadPlugin(pathfinder);
+        bot.loadPlugin(movement.plugin);
+
+
         this.setupEventHandlers();
         this.ensureLogDirectory();
     }
@@ -32,6 +56,16 @@ class MovementController {
     private setupEventHandlers(): void {
         this.bot.on('goal_reached', () => {
             this.t.printMessage('Цель достигнута');
+        });
+
+        this.bot.once("login", () => {
+            // load heuristics with default configuration
+            const { Default } = this.bot.movement.goals;
+            this.bot.movement.setGoal(Default);
+            // set control states
+            this.bot.setControlState("forward", true);
+            this.bot.setControlState("sprint", true);
+            this.bot.setControlState("jump", true);
         });
 
 
@@ -65,13 +99,14 @@ class MovementController {
 
     private ensureLogDirectory(): void {
         if (!fs.existsSync(this.logDir)) {
-            fs.mkdirSync(this.logDir, { recursive: true });
+            fs.mkdirSync(this.logDir, {recursive: true});
         }
     }
-    public gotoBlock(x: string, y: string, z: string, username: string, ...other: string[]):string | undefined {
-        const _x: number = x == "~"? this.bot.entity.position.x: Number(x);
-        const _y: number = y == "~"? this.bot.entity.position.y: Number(y)
-        const _z: number = z == "~"? this.bot.entity.position.z: Number(z)
+
+    public gotoBlock(x: string, y: string, z: string, username: string, ...other: string[]): string | undefined {
+        const _x: number = x == "~" ? this.bot.entity.position.x : Number(x);
+        const _y: number = y == "~" ? this.bot.entity.position.y : Number(y)
+        const _z: number = z == "~" ? this.bot.entity.position.z : Number(z)
         const _target = this.bot.players[username] ? this.bot.players[username].entity : null;
 
         if (isNaN(_x) || isNaN(_y) || isNaN(_z)) {
@@ -82,12 +117,12 @@ class MovementController {
         }
 
         this.bot.pathfinder.setGoal(new GoalNear(_x, _y, _z, 0));
-        const defaultMove:Movements = new Movements(this.bot);
+        const defaultMove: Movements = new Movements(this.bot);
         const path = this.bot.pathfinder.getPathTo(defaultMove, new GoalNear(_x, _y, _z, 0));
 
         this.t.printMessage(`Бот идет в координаты: ${_x}, ${_y}, ${_z}`);
         this.chat.sendDirectMessage(username, `Бот идет в координаты: ${_x} ${_y} ${_z}`);
-        this.bot.once('goal_reached', ():void => {
+        this.bot.once('goal_reached', (): void => {
             this.t.printMessage(`Pathfinder достиг цели по координатам: ${_x}, ${_y}, ${_z}`);
             this.chat.sendDirectMessage(username, `Достигнутые координаты: ${_x} ${_y} ${_z}`);
         });
@@ -107,12 +142,12 @@ class MovementController {
 
         if (_target) {
             this.bot.pathfinder.setGoal(new GoalFollow(_target, 1), true);
-            const message:string = 'Следование за игроком';
+            const message: string = 'Следование за игроком';
             this.chat.sendDirectMessage(username, message);
             this.t.printMessage(message);
             return message;
         } else {
-            const errorMessage:string = `Не удалось найти объект для игрока: ${username}`;
+            const errorMessage: string = `Не удалось найти объект для игрока: ${username}`;
             this.chat.sendDirectMessage(username, errorMessage);
             console.error(errorMessage);
             return errorMessage;
@@ -120,4 +155,4 @@ class MovementController {
     }
 }
 
-export { MovementController };
+export {MovementController};

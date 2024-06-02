@@ -10,8 +10,8 @@ class Terminal {
         this.chatHandler = chatHandler;
     }
 
-    public printMessage(message: string): void {
-        console.log(message);
+    public printMessage(message:any): void {
+        console.log(String(message));
     }
 
     public prompt(): void {

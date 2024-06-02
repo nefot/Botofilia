@@ -3,18 +3,100 @@ import {Terminal} from './terminal';
 import 'colorts/lib/string';
 import {MovementController} from './MovementController';
 import {ChatController} from './ChatController';
+import fs from "fs";
+import path from "path";
+
+class Coordinates {
+    constructor(public x: number, public y: number, public z: number) {
+    }
+
+    // Метод для вывода координат в виде строки
+    toString(): string {
+        return `x=${this.x}, y=${this.y}, z=${this.z}`;
+    }
+}
+
+// Интерфейс для классов, которые могут считывать координаты из лога
+interface LogReader {
+    readCoordinatesFromLog(log: string): Coordinates | null;
+}
+
+// Класс для чтения координат из файла лога
+class LogFileReader implements LogReader {
+    readCoordinatesFromLog(log: string): Coordinates | null {
+        try {
+            console.log('readCoordinatesFromLog')
+            // Регулярное выражение для поиска координат в строке лога
+            const regex = /\[.*?\] \{.*?\} Dimension: \w+, Coordinates: x=(-?\d+\.\d+), y=(-?\d+\.\d+), z=(-?\d+\.\d+)/;
+            const match = log.match(regex);
+            console.log(match, log)
+
+            if (match) {
+                const x = parseFloat(match[1]);
+                const y = parseFloat(match[2]);
+                const z = parseFloat(match[3]);
+                return new Coordinates(x, y, z);
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error("Error reading log:", error);
+            return null;
+        }
+    }
+
+    // Метод для чтения координат из файла лога
+    readCoordinatesFromLogFile(filePath: string): Coordinates | null {
+        try {
+            // Чтение содержимого файла
+            const content = fs.readFileSync(filePath, 'utf-8');
+            // Разбиение содержимого на строки
+            const lines = content.split('\n');
+            // Поиск последней непустой строки
+            let lastLine = lines[lines.length - 1];
+            if (!lastLine.trim()) {
+                lastLine = lines[lines.length - 2];
+            }
+            // Вызов метода readCoordinatesFromLog для обработки последней строки
+            return this.readCoordinatesFromLog(lastLine);
+        } catch (error) {
+            console.error("Error reading log file:", error);
+            return null;
+        }
+    }
+}
+
+// Пример использования класса
+const logFilePath = 'D:/Desktop/mineflayer_bot/dist/Death/Death.log'; // Укажите правильный путь к вашему файлу лога
+const logReader = new LogFileReader();
+const coordinates = logReader.readCoordinatesFromLogFile(logFilePath);
+if (coordinates) {
+    console.log("Coordinates:", coordinates.toString());
+} else {
+    console.log("Failed to read coordinates from log file.");
+}
 
 class ChatHandler {
     private bot: mineflayer.Bot;
     private movementController: MovementController;
     private chat: ChatController;
+    private logDir: string = path.join(__dirname, 'Death','Death.log');
     private t: Terminal;
+    private logReader: LogFileReader;
 
     constructor(bot: mineflayer.Bot, terminal: Terminal) {
         this.bot = bot;
+        this.logReader = new LogFileReader();
         this.chat = new ChatController(this.bot, '');
         this.t = terminal
         this.movementController = new MovementController(this.bot, this.chat, terminal); // Передаем chat и terminal
+    }
+
+    public death() {
+        const coordinates = this.logReader.readCoordinatesFromLogFile(this.logDir);
+        this.t.printMessage(this.logDir)
+        this.t.printMessage(coordinates ? coordinates.toString() : "Записей о смерти нет");
+        return coordinates ? coordinates.toString() : "Записей о смерти нет";
     }
 
     public handleChatMessage(username: string, message: string): void {
@@ -30,7 +112,7 @@ class ChatHandler {
                 this.t.printMessage(`${username}, ${this.movementController.comeToPlayer(username)}`);
                 break;
             case 'stop':
-                this.t.printMessage(`${username}, ${ this.movementController.stopBot(username)}`);
+                this.t.printMessage(`${username}, ${this.movementController.stopBot(username)}`);
                 break;
             case 'echo':
                 const mes1: string = mes.slice(1).join(' ');
@@ -42,12 +124,20 @@ class ChatHandler {
             case 'health':
                 this.t.printMessage(`/msg ${username} здоровье: ${this.bot.health} насыщение: ${this.bot.food} позиция: ${this.bot.entity.position}`);
                 break;
+            case  'last':
+                switch (mes[1]) {
+                    case 'death':
+                        this.t.printMessage(this.death());
+                        break;
+                    default:
+                        this.t.printMessage(`Command '${command}' '${mes[1]}' is not recognized.`)
+                }
+                break; // Добавлено пропущенное break
             default:
                 this.t.printMessage(`Command '${command}' is not recognized.`);
                 break;
         }
     }
-
 }
 
 class MinecraftBot {
@@ -78,8 +168,6 @@ class MinecraftBot {
             port: port,
             ...options,
         });
-
-
 
         this.terminal = new Terminal(); // Создаем экземпляр Terminal
 
@@ -151,8 +239,6 @@ const bot = new MinecraftBot(
     parseInt(process.argv[5]),
     process.argv[6] === "true"
 );
-
-
 
 // Инициализация Terminal
 bot.terminal.printMessage('Welcome to the terminal!');
