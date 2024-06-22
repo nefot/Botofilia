@@ -6,8 +6,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "*": ["*", "src/*"]                  // Пути для разрешения импортов
+    }
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    "srs/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

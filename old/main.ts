@@ -1,14 +1,13 @@
 import * as mineflayer from 'mineflayer';
-import {Terminal} from './terminal';
+import { Terminal } from './terminal';
 import 'colorts/lib/string';
-import {MovementController} from './MovementController';
-import {ChatController} from './ChatController';
+import { MovementController } from './MovementController';
+import { ChatController } from './ChatController';
 import fs from "fs";
 import path from "path";
 
 class Coordinates {
-    constructor(public x: number, public y: number, public z: number) {
-    }
+    constructor(public x: number, public y: number, public z: number) {}
 
     // Метод для вывода координат в виде строки
     toString(): string {
@@ -25,11 +24,11 @@ interface LogReader {
 class LogFileReader implements LogReader {
     readCoordinatesFromLog(log: string): Coordinates | null {
         try {
-            console.log('readCoordinatesFromLog')
+            console.log('readCoordinatesFromLog');
             // Регулярное выражение для поиска координат в строке лога
             const regex = /\[.*?\] \{.*?\} Dimension: \w+, Coordinates: x=(-?\d+\.\d+), y=(-?\d+\.\d+), z=(-?\d+\.\d+)/;
             const match = log.match(regex);
-            console.log(match, log)
+            console.log(match, log);
 
             if (match) {
                 const x = parseFloat(match[1]);
@@ -46,7 +45,11 @@ class LogFileReader implements LogReader {
     }
 
     // Метод для чтения координат из файла лога
-    readCoordinatesFromLogFile(filePath: string): Coordinates | null {
+    readCoordinatesFromLogFile(filePath: string | undefined): Coordinates | null {
+        if (!filePath || !fs.existsSync(filePath)) {
+            console.error("Файл не найден или путь неверный:", filePath);
+            return null;
+        }
         try {
             // Чтение содержимого файла
             const content = fs.readFileSync(filePath, 'utf-8');
@@ -80,7 +83,7 @@ class ChatHandler {
     private bot: mineflayer.Bot;
     private movementController: MovementController;
     private chat: ChatController;
-    private logDir: string = path.join(__dirname, 'Death','Death.log');
+    private logDir: string = path.join(__dirname, 'Death', 'Death.log');
     private t: Terminal;
     private logReader: LogFileReader;
 
@@ -88,15 +91,18 @@ class ChatHandler {
         this.bot = bot;
         this.logReader = new LogFileReader();
         this.chat = new ChatController(this.bot, '');
-        this.t = terminal
+        this.t = terminal;
         this.movementController = new MovementController(this.bot, this.chat, terminal); // Передаем chat и terminal
     }
 
     public death() {
         const coordinates = this.logReader.readCoordinatesFromLogFile(this.logDir);
-        this.t.printMessage(this.logDir)
-        this.t.printMessage(coordinates ? coordinates.toString() : "Записей о смерти нет");
-        return coordinates ? coordinates.toString() : "Записей о смерти нет";
+        if (coordinates != null) {
+            this.t.printMessage(this.logDir);
+            this.t.printMessage(coordinates ? coordinates.toString() : "Записей о смерти нет");
+            return coordinates ? coordinates.toString() : "Записей о смерти нет";
+        }
+        return 'Записей о смерти нет';
     }
 
     public handleChatMessage(username: string, message: string): void {
@@ -106,7 +112,7 @@ class ChatHandler {
 
         switch (command) {
             case 'goto':
-                this.t.printMessage(`${username} ${this.movementController.gotoBlock(mes[1], mes[2], mes[3], username)}`)
+                this.t.printMessage(`${username} ${this.movementController.gotoBlock(mes[1], mes[2], mes[3], username)}`);
                 break;
             case 'come':
                 this.t.printMessage(`${username}, ${this.movementController.comeToPlayer(username)}`);
@@ -124,15 +130,15 @@ class ChatHandler {
             case 'health':
                 this.t.printMessage(`/msg ${username} здоровье: ${this.bot.health} насыщение: ${this.bot.food} позиция: ${this.bot.entity.position}`);
                 break;
-            case  'last':
+            case 'last':
                 switch (mes[1]) {
                     case 'death':
                         this.t.printMessage(this.death());
                         break;
                     default:
-                        this.t.printMessage(`Command '${command}' '${mes[1]}' is not recognized.`)
+                        this.t.printMessage(`Command '${command}' '${mes[1]}' is not recognized.`);
                 }
-                break; // Добавлено пропущенное break
+                break;
             default:
                 this.t.printMessage(`Command '${command}' is not recognized.`);
                 break;
