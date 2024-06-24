@@ -10,24 +10,13 @@ import * as path from 'path';
 import movement from 'mineflayer-movement';
 
 
-
-
-
-
-
-
 interface IMovementController {
     gotoBlock(x: number, y: number, z: number, username: string): string;
+
     comeToPlayer(username: string): string;
+
     stopBot(username: string): string;
 }
-
-
-
-
-
-
-
 
 
 class MovementController {
@@ -38,7 +27,6 @@ class MovementController {
     private logDir: string = path.join(__dirname, 'Death');
     private logFilePath: string = path.join(this.logDir, 'Death.log');
     private lastDamageSource: string | null = null;
-
 
 
     constructor(bot: mineflayer.Bot, chat: ChatController, terminal: Terminal) {
@@ -60,7 +48,7 @@ class MovementController {
 
         this.bot.once("login", () => {
             // load heuristics with default configuration
-            const { Default } = this.bot.movement.goals;
+            const {Default} = this.bot.movement.goals;
             this.bot.movement.setGoal(Default);
             // set control states
             this.bot.setControlState("forward", true);

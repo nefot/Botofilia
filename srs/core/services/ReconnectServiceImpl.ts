@@ -1,15 +1,16 @@
-import { IReconnectService } from '../interfaces/ReconnectService';
-import { MinecraftBotDTO } from '../dtos/MinecraftBotDTO';
-import { IMinecraftBotRepository } from '../interfaces/MinecraftBotRepository';
-import { MinecraftBotController } from '../../ui/controllers/MinecraftBotController';
-import { MinecraftBot } from '../entities/MinecraftBot';
+import {IReconnectService} from '../interfaces/ReconnectService';
+import {MinecraftBotDTO} from '../dtos/MinecraftBotDTO';
+import {IMinecraftBotRepository} from '../interfaces/MinecraftBotRepository';
+import {MinecraftBotController} from '../../ui/controllers/MinecraftBotController';
+import {MinecraftBot} from '../entities/MinecraftBot';
 import mineflayer from 'mineflayer';
 
 export class ReconnectServiceImpl implements IReconnectService {
     constructor(
         private botRepository: IMinecraftBotRepository,
         private botController: MinecraftBotController
-    ) {}
+    ) {
+    }
 
     async connectBot(botDTO: MinecraftBotDTO): Promise<void> {
         const bot = this.createMinecraftBot(botDTO);

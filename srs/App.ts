@@ -1,13 +1,16 @@
 import mineflayer from 'mineflayer';
-import { MinecraftBotRepositoryImpl } from './infrastructure/repositories/MinecraftBotRepositoryImpl';
-import { MinecraftBotController } from './ui/controllers/MinecraftBotController';
-import { ChatService } from './core/services/ChatService';
-import { ChatHandler } from './core/handlers/ChatHandler';
-import { MovementHandler } from './core/movements/MovementHandler';
-import { LoggerService } from './core/services/LoggerService';
-import { ReconnectServiceImpl } from './core/services/ReconnectServiceImpl';
-import { MinecraftBotDTO } from './core/dtos/MinecraftBotDTO';
-import { MinecraftBot } from './core/entities/MinecraftBot';
+import {pathfinder, Movements, goals} from 'mineflayer-pathfinder';
+import {MinecraftBotRepositoryImpl} from './infrastructure/repositories/MinecraftBotRepositoryImpl';
+import {MinecraftBotController} from './ui/controllers/MinecraftBotController';
+import {ChatService} from './core/services/ChatService';
+import {ChatHandler} from './core/handlers/ChatHandler';
+import {MovementHandler} from './core/movements/MovementHandler';
+import {LoggerService} from './core/services/LoggerService';
+import {ReconnectServiceImpl} from './core/services/ReconnectServiceImpl';
+import {MinecraftBotDTO} from './core/dtos/MinecraftBotDTO';
+import {MinecraftBot} from './core/entities/MinecraftBot';
+import {TerminalHandler} from './core/handlers/TerminalHandler';
+import {TerminalController} from './ui/controllers/TerminalController';
 
 export class App {
     private botRepository: MinecraftBotRepositoryImpl;
@@ -17,15 +20,19 @@ export class App {
     private loggerService: LoggerService;
     private botController: MinecraftBotController;
     private reconnectService: ReconnectServiceImpl;
+    private terminalHandler: TerminalHandler;
+    private terminalController: TerminalController;
 
     constructor() {
         this.loggerService = new LoggerService();
-        this.movementHandler = new MovementHandler();
+        this.movementHandler = new MovementHandler(this.loggerService);
         this.chatHandler = new ChatHandler(this.loggerService, this.movementHandler);
         this.botRepository = new MinecraftBotRepositoryImpl();
         this.chatService = new ChatService(this.botRepository, this.chatHandler);
         this.botController = new MinecraftBotController(this.chatService);
         this.reconnectService = new ReconnectServiceImpl(this.botRepository, this.botController);
+        this.terminalHandler = new TerminalHandler(this.movementHandler, this.botRepository);
+        this.terminalController = new TerminalController(this.terminalHandler);
     }
 
     async start(): Promise<void> {
@@ -53,21 +60,33 @@ export class App {
         bot.bot.on('spawn', () => {
             console.log(`Bot ${botDTO.username} retrieved successfully.`);
         });
+
+        this.terminalController.startListening();
     }
 
     private createMinecraftBot(botDTO: MinecraftBotDTO): Promise<MinecraftBot> {
         return new Promise((resolve, reject) => {
             try {
-                const bot = new MinecraftBot(
+                const bot = mineflayer.createBot({
+                    host: botDTO.host,
+                    port: botDTO.port,
+                    username: botDTO.username,
+                    password: botDTO.password,
+                    ...botDTO.options,
+                });
+
+                bot.loadPlugin(pathfinder);
+
+                const minecraftBot = new MinecraftBot(
                     botDTO.username,
                     botDTO.password,
-                    mineflayer.createBot(botDTO),
+                    bot,
                     botDTO.host,
                     botDTO.chat_logger,
                     botDTO.port,
                     botDTO.options
                 );
-                resolve(bot);
+                resolve(minecraftBot);
             } catch (error) {
                 reject(error);
             }

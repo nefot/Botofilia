@@ -20,5 +20,6 @@ export class MinecraftBotDTO {
         public port?: number, // изменено на number
         public options?: any,
         public client?: any // добавлен client
-    ) {}
+    ) {
+    }
 }
