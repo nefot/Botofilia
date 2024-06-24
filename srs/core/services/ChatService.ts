@@ -1,19 +1,14 @@
-import { MinecraftBotRepository } from '../interfaces/MinecraftBotRepository';
-import { ChatHandler } from '../handlers/ChatHandler';
+import { IChatService } from '../interfaces/ChatService';
+import { IChatHandler } from '../interfaces/ChatHandler';
+import { IMinecraftBotRepository } from '../interfaces/MinecraftBotRepository';
+import { MinecraftBot } from '../entities/MinecraftBot';
 
-export class ChatService {
+export class ChatService implements IChatService {
     constructor(
-        private botRepository: MinecraftBotRepository,
-        private chatHandler: ChatHandler
+        private botRepository: IMinecraftBotRepository,
+        private chatHandler: IChatHandler
     ) {}
 
-    /**
-     * Обрабатывает сообщение чата.
-     *
-     * @param {string} botId - Идентификатор бота.
-     * @param {string} username - Имя пользователя, отправившего сообщение.
-     * @param {string} message - Сообщение.
-     */
     async handleChatMessage(botId: string, username: string, message: string): Promise<void> {
         const bot = await this.botRepository.findById(botId);
         if (bot) {

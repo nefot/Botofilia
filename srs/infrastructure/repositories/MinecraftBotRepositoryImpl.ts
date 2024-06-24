@@ -1,10 +1,7 @@
-import { MinecraftBotRepository } from '../../core/interfaces/MinecraftBotRepository';
+import { IMinecraftBotRepository } from '../../core/interfaces/MinecraftBotRepository';
 import { MinecraftBot } from '../../core/entities/MinecraftBot';
 
-/**
- * Реализация интерфейса MinecraftBotRepository.
- */
-export class MinecraftBotRepositoryImpl implements MinecraftBotRepository {
+export class MinecraftBotRepositoryImpl implements IMinecraftBotRepository {
     private bots: Map<string, MinecraftBot> = new Map();
 
     async findById(id: string): Promise<MinecraftBot | null> {
