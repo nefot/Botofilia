@@ -4,28 +4,10 @@
   "description": "none",
   "main": "test_reqest.js",
   "scripts": {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "test": "node dist/index.js archive 0303708000 192.168.134.156 true 26565",
     "test519": " node archive SoulWarden 0303708000 77.235.121.114",
     "test549": " node dist/Colorize.js",
-    "test59": " node dist/main.js WilsonXilson 0303708000 77.235.121.114",
+    "test59": " node dist/index.js WilsonXilson 0303708000 77.235.121.114",
     "test5": " node dist/rrr.js",
     "runscript": "node dist/RunScript.js"
   },
@@ -34,24 +16,24 @@
   "dependencies": {
     "cli-color": "^2.0.4",
     "colorts": "^0.1.63",
-    "express": "^4.18.2",
-    "mineflayer": "^4.20.0",
-    "mineflayer-auto-eat": "^3.3.6",
+    "express": "^4.21.0",
+    "mineflayer": "^4.20.1",
+    "mineflayer-auto-eat": "^4.0.0",
     "mineflayer-movement": "^0.4.4",
     "mineflayer-pathfinder": "^2.4.5",
     "npm-run-all": "^4.1.5",
-    "terminate": "^2.6.1",
+    "terminate": "^2.8.0",
     "vec3": "^0.1.10",
-    "websocket": "^1.0.34"
+    "websocket": "^1.0.35"
   },
   "devDependencies": {
     "@types/cli-color": "^2.0.6",
-    "@types/node": "^20.11.24",
-    "concurrently": "^8.2.2",
-    "mocha": "^10.3.0",
-    "parallelshell": "^3.0.1",
+    "@types/node": "^22.5.4",
+    "concurrently": "^9.0.1",
+    "mocha": "^10.7.3",
+    "parallelshell": "^3.0.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.6.2"
   },
   "dev": "concurrently --kill-others \"npm run test1\" \"npm run test2\""
 }

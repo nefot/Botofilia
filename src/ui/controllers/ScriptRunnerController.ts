@@ -2,7 +2,7 @@ import { ScriptRunnerService } from '../../core/services/ScriptRunnerService';
 import { ScriptRunner } from '../../core/entities/ScriptRunner';
 
 export class ScriptRunnerController {
-    private scriptRunnerService: ScriptRunnerService;
+    public scriptRunnerService: ScriptRunnerService;
 
     constructor() {
         const scriptRunner = new ScriptRunner('tt.txt', '26.191.119.49', '0303708000', 26565);
@@ -14,8 +14,8 @@ export class ScriptRunnerController {
     }
 
     runScripts(): void {
-        const names = this.scriptRunnerService.scriptRunner.readNamesFromFile();
-        this.scriptRunnerService.scriptRunner.createScripts(names);
+        const names = this.scriptRunnerService.getNamesFromFile(); // Используйте метод
+        this.scriptRunnerService.createScripts(names); // Используйте метод
         this.scriptRunnerService.runScripts();
     }
 }

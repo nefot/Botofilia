@@ -33,5 +33,5 @@ function printFilesContents(directory: string): void {
 }
 
 // Укажите путь к директории, которую хотите обойти
-const directory: string = "C:\\Users\\artyo\\mineflayer_bot\\srs";
+const directory: string = "C:\\Users\\artyo\\mineflayer_bot\\src";
 printFilesContents(directory);

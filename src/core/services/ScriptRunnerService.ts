@@ -29,4 +29,14 @@ export class ScriptRunnerService {
             delay += 5000;
         });
     }
+
+    // Метод для чтения имен из файла
+    public getNamesFromFile(): string[] {
+        return this.scriptRunner.readNamesFromFile(); // Предполагается, что этот метод существует
+    }
+
+    // Метод для создания скриптов
+    public createScripts(names: string[]): void {
+        this.scriptRunner.createScripts(names);
+    }
 }
