@@ -20,6 +20,7 @@ export class ChatHandler implements IChatHandler {
             case 'stop':
                 this.movementHandler.stop(bot);
                 break;
+
         }
     }
 }

@@ -4,7 +4,7 @@
   "description": "none",
   "main": "test_reqest.js",
   "scripts": {
-    "test": "node dist/index.js archive 0303708000 192.168.134.156 true 26565",
+    "test": "node dist/index.js archive 0303708000 127.0.0.1 true 25565",
     "test519": " node archive SoulWarden 0303708000 77.235.121.114",
     "test549": " node dist/Colorize.js",
     "test59": " node dist/index.js WilsonXilson 0303708000 77.235.121.114",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@types/cli-color": "^2.0.6",
-    "@types/node": "^22.5.4",
+    "@types/node": "^22.5.5",
     "concurrently": "^9.0.1",
     "mocha": "^10.7.3",
     "parallelshell": "^3.0.2",

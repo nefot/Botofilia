@@ -104,9 +104,11 @@ class MovementController {
             return errorMessage;
         }
 
-        this.bot.pathfinder.setGoal(new GoalNear(_x, _y, _z, 0));
+
+
+        this.bot.pathfinder.setGoal(new GoalNear(_x, _y, _z, 1));
         const defaultMove: Movements = new Movements(this.bot);
-        const path = this.bot.pathfinder.getPathTo(defaultMove, new GoalNear(_x, _y, _z, 0));
+        const path = this.bot.pathfinder.getPathTo(defaultMove, new GoalNear(_x, _y, _z, 1));
 
         this.t.printMessage(`Бот идет в координаты: ${_x}, ${_y}, ${_z}`);
         this.chat.sendDirectMessage(username, `Бот идет в координаты: ${_x} ${_y} ${_z}`);

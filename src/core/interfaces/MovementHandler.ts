@@ -9,8 +9,9 @@ export interface IMovementHandler {
 
     stop(bot: MinecraftBot): void;
 
-    gotoBlock(bot: MinecraftBot, x: number, y: number, z: number): void;
+    gotoBlock(bot: MinecraftBot, x: string, y: string, z: string, username: string, ...other: string[]): string | undefined
 
+    blockPlace(bot: MinecraftBot, x: string, y: string, z: string,username: string, blockName: string, ...other: string[]): string | void
 
 
 }
