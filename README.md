@@ -1,160 +1,85 @@
-# Botofilia
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-Botofilia — это проект для создания и управления ботами Minecraft с использованием библиотеки Mineflayer. Этот проект
-включает в себя функционал для подключения, переподключения и управления ботами через различные сервисы и контроллеры.
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-## Структура проекта
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-```plaintext
-├── App.ts
-├── index.ts
-├── rrr.ts
-├── core
-│   ├── dtos
-│   │   └── MinecraftBotDTO.ts
-│   ├── entities
-│   │   └── MinecraftBot.ts
-│   ├── handlers
-│   │   └── ChatHandler.ts
-│   ├── interfaces
-│   │   └── ChatHandler.ts
-│   │   └── ChatService.ts
-│   │   └── Logger.ts
-│   │   └── MinecraftBotRepository.ts
-│   │   └── ReconnectService.ts
-│   ├── movements
-│   │   └── MovementHandler.ts
-│   ├── services
-│   │   └── ChatService.ts
-│   │   └── LoggerService.ts
-│   │   └── ReconnectServiceImpl.ts
-├── infrastructure
-│   └── repositories
-│       └── MinecraftBotRepositoryImpl.ts
-└── ui
-    └── controllers
-        └── MinecraftBotController.ts
-```
+## Description
 
-## Установка
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-1. Клонируйте репозиторий:
-
-    ```bash
-    git clone https://github.com/yourusername/botofilia.git
-    cd botofilia
-    ```
-
-2. Установите зависимости:
-
-    ```bash
-    npm install
-    ```
-
-## Использование
-
-### Запуск проекта
-
-Для запуска проекта используйте следующую команду:
+## Project setup
 
 ```bash
-npm start <username> <password> <host> <chat_logger> <port>
+$ npm install
 ```
 
-Пример:
+## Compile and run the project
 
 ```bash
-npm start bot_username bot_password localhost true 25565
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
 ```
 
-### Основные классы и их функции
+## Run tests
 
-#### `App.ts`
+```bash
+# unit tests
+$ npm run test
 
-Главный класс приложения, отвечающий за инициализацию и запуск ботов.
+# e2e tests
+$ npm run test:e2e
 
-#### `MinecraftBotDTO.ts`
-
-Data Transfer Object (DTO) для передачи данных о ботах Minecraft.
-
-#### `MinecraftBot.ts`
-
-Класс, представляющий собой бота для Minecraft.
-
-#### `ChatHandler.ts`
-
-Обработчик сообщений чата.
-
-#### `ChatService.ts`
-
-Сервис для обработки сообщений чата.
-
-#### `Logger.ts`
-
-Интерфейс для логирования сообщений и событий.
-
-#### `ReconnectService.ts`
-
-Интерфейс для управления подключением и переподключением ботов.
-
-#### `MovementHandler.ts`
-
-Обработчик движений бота.
-
-#### `ReconnectServiceImpl.ts`
-
-Реализация интерфейса `ReconnectService`, включающая методы для подключения и переподключения ботов.
-
-#### `MinecraftBotRepositoryImpl.ts`
-
-Реализация репозитория для управления ботами.
-
-#### `MinecraftBotController.ts`
-
-Контроллер для управления ботами и их взаимодействия с другими сервисами.
-
-### Примеры использования
-
-#### Создание и подключение бота
-
-```typescript
-import {App} from './App';
-
-async function main(): Promise<void> {
-    try {
-        const app = new App();
-        await app.start();
-    } catch (error) {
-        console.error('An error occurred:', error);
-    }
-}
-
-main().then(() => {
-    console.log('The main function completed successfully.');
-}).catch((error) => {
-    console.error('An error occurred:', error);
-});
+# test coverage
+$ npm run test:cov
 ```
 
-#### Логирование событий и сообщений
+## Resources
 
-```typescript
-import {LoggerService} from './core/services/LoggerService';
+Check out a few resources that may come in handy when working with NestJS:
 
-const logger = new LoggerService();
-logger.logChatMessage('user', 'Hello, world!');
-logger.logEvent('Bot connected');
-```
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
 
-## Вклад в проект
+## Support
 
-Если вы хотите внести вклад в проект, пожалуйста, создайте форк репозитория, внесите свои изменения и создайте pull
-request. Мы рассмотрим ваши предложения и интегрируем их в основной проект.
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Лицензия
+## Stay in touch
 
-Этот проект лицензирован под лицензией MIT. Подробности см. в файле `LICENSE`.
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
 
-## Контакты
+## License
 
-Если у вас есть вопросы или предложения, пожалуйста, свяжитесь с нами по адресу artyom27000@mail.ru
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
