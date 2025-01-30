@@ -1,68 +1,88 @@
 import { spawn, ChildProcess } from 'child_process';
-import { readFileSync, appendFileSync } from 'fs';
+import { readFileSync } from 'fs';
+import * as WebSocket from 'ws';
 
 namespace Setting {
-    export const filename = 'tt.txt';
-    export const names = readNamesFromFile(filename);
-    export let scripts: string[] = [];
-    export let host = '26.191.119.49';
-    export let password = '0303708000';
-    export let port = 26565;
+  export const filename = 'tt.txt';
+  export const names = readNamesFromFile(filename);
+  export let scripts: string[] = [];
+  export let host = '77.235.121.114';
+  export let password = '0303708000';
+  export let port = 25565;
+  export let wsPort = 8081;
 }
+
+const bots: Record<string, ChildProcess> = {};
 
 function readNamesFromFile(filename: string): string[] {
-    try {
-        const data = readFileSync(filename, 'utf8');
-        return data.trim().split('\n');
-    } catch (err) {
-        console.error(`Error reading file ${filename}:`, err);
-        return [];
-    }
+  try {
+    const data = readFileSync(filename, 'utf8');
+    return data.trim().split('\n').filter(name => name.length > 0);
+  } catch (err) {
+    console.error(`Ошибка чтения файла ${filename}:`, err);
+    return [];
+  }
 }
 
-function createScripts(): void {
-    for (const name of Setting.names) {
-        Setting.scripts.push(`node dist/main.js ${name.replace(/\r/g, '')} ${Setting.password} ${Setting.host} ${Setting.port}`);
+async function runScripts(): Promise<void> {
+  for (const botName of Setting.names) {
+    const script = `node dist/main.js ${botName} ${Setting.password} ${Setting.host} ${Setting.port}`;
+
+    if (bots[botName]) {
+      console.log(`Бот ${botName} уже запущен!`);
+      continue;
     }
-    console.log(Setting.scripts);
-}
 
-function runScripts(scriptList: string[]): void {
-    let delay = 0;
-    scriptList.forEach((script: string) => {
-        setTimeout(() => {
-            const childProcess: ChildProcess = spawn(script, { shell: true, stdio: 'inherit' });
+    console.log(`Ожидание 5 секунд перед запуском бота ${botName}...`);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
-            childProcess.on('close', (code: number | null) => {
-                console.log(`Script finished with code ${code}: ${script}`);
-            });
+    const childProcess = spawn(script, { shell: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    bots[botName] = childProcess;
 
-            childProcess.on('error', (err: Error) => {
-                console.error(`Error running script: ${err}`);
-            });
+    console.log(`Запущен бот: ${botName}`);
 
-        }, delay);
-        delay += 5000;
+    childProcess.stdout.on('data', (data) => console.log(`[${botName}]: ${data.toString().trim()}`));
+    childProcess.stderr.on('data', (data) => console.error(`[Ошибка ${botName}]: ${data.toString().trim()}`));
+
+    childProcess.on('close', (code) => {
+      console.log(`Бот ${botName} отключился с кодом ${code}`);
+      delete bots[botName];
     });
+  }
 }
 
-function generateNamesAndAppendToFile(): void {
-    let names = '';
+// WebSocket сервер
+const wss = new WebSocket.Server({ port: Setting.wsPort });
 
-    for (let i = 1; i <= 1000; i++) {
-        names += `nefoter${i}\n`;
-    }
+wss.on('connection', (ws) => {
+  console.log('Клиент подключен к WebSocket-серверу.');
 
+  ws.on('message', (message) => {
     try {
-        appendFileSync(Setting.filename, names);
-        console.log('Names successfully added to the file', Setting.filename);
+      const text = message.toString().trim();
+      console.log(`Получено сообщение: ${text}`);
+
+      const [botName, ...commandParts] = text.split(' ');
+      const command = commandParts.join(' ');
+
+      if (bots[botName] && bots[botName].stdin) {
+        console.log(`Отправка команды боту ${botName}: ${command}`);
+        if (bots[botName]?.stdin) {
+          console.log(`Отправка команды боту ${botName}: ${command}`);
+          bots[botName].stdin!.write(command + '\n');
+        } else {
+          console.error(`Ошибка: бот ${botName} не найден или stdin отсутствует.`);
+        }
+
+      } else {
+        console.error(`Ошибка: бот ${botName} не найден или stdin отсутствует.`);
+      }
     } catch (err) {
-        console.error('Error adding names to file:', err);
+      console.error('Ошибка обработки команды:', err);
     }
-}
+  });
+});
 
-generateNamesAndAppendToFile();
+console.log(`WebSocket-сервер запущен на порту ${Setting.wsPort}`);
 
-console.log(Setting.names, Setting.names.length);
-createScripts();
-runScripts(Setting.scripts);
+runScripts();

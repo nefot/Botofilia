@@ -1,245 +1,122 @@
-import * as mineflayer from 'mineflayer';
-import {Terminal} from './terminal';
-import 'colorts/lib/string';
-import {MovementController} from './MovementController';
-import {ChatController} from './ChatController';
-import fs from "fs";
-import path from "path";
+import { createBot, Bot, BotOptions } from 'mineflayer';
+import * as readline from 'readline';
+import * as fs from 'fs';
+import WebSocket from 'ws';
 
-class Coordinates {
-    constructor(public x: number, public y: number, public z: number) {
-    }
-
-    // Метод для вывода координат в виде строки
-    toString(): string {
-        return `x=${this.x}, y=${this.y}, z=${this.z}`;
-    }
+const args: string[] = process.argv.slice(2);
+if (args.length < 3) {
+  console.error('Использование: node main.ts <никнейм> <пароль> <адрес> [порт]');
+  process.exit(1);
 }
 
-// Интерфейс для классов, которые могут считывать координаты из лога
-interface LogReader {
-    readCoordinatesFromLog(log: string): Coordinates | null;
-}
+const [username, password, host, port] = args;
+const botOptions: BotOptions = {
+  host,
+  port: port ? parseInt(port) : 25565,
+  username,
+  password,
+  version: '1.21.4',
+};
 
-// Класс для чтения координат из файла лога
-class LogFileReader implements LogReader {
-    readCoordinatesFromLog(log: string): Coordinates | null {
-        try {
-            console.log('readCoordinatesFromLog')
-            // Регулярное выражение для поиска координат в строке лога
-            const regex = /\[.*?\] \{.*?\} Dimension: \w+, Coordinates: x=(-?\d+\.\d+), y=(-?\d+\.\d+), z=(-?\d+\.\d+)/;
-            const match = log.match(regex);
-            console.log(match, log)
+let bot: Bot;
+const ws = new WebSocket('ws://localhost:8081');
 
-            if (match) {
-                const x = parseFloat(match[1]);
-                const y = parseFloat(match[2]);
-                const z = parseFloat(match[3]);
-                return new Coordinates(x, y, z);
-            } else {
-                return null;
-            }
-        } catch (error) {
-            console.error("Error reading log:", error);
-            return null;
+ws.on('open', () => {
+  console.log(`[${username}] Подключен к серверу команд.`);
+});
+
+ws.on('message', (data: WebSocket.RawData) => {
+    try {
+        const message = data.toString().trim();
+        console.log(`[${username}] Получена команда: ${message}`);
+
+        const [botName, ...commandParts] = message.split(' ');
+        const command = commandParts.join(' ');
+
+        if (botName === username) {
+            executeCommand(command);
         }
+    } catch (err) {
+        console.error(`[${username}] Ошибка обработки команды:`, err);
     }
+});
 
-    // Метод для чтения координат из файла лога
-    readCoordinatesFromLogFile(filePath: string): Coordinates | null {
-        try {
-            // Чтение содержимого файла
-            const content = fs.readFileSync(filePath, 'utf-8');
-            // Разбиение содержимого на строки
-            const lines = content.split('\n');
-            // Поиск последней непустой строки
-            let lastLine = lines[lines.length - 1];
-            if (!lastLine.trim()) {
-                lastLine = lines[lines.length - 2];
-            }
-            // Вызов метода readCoordinatesFromLog для обработки последней строки
-            return this.readCoordinatesFromLog(lastLine);
-        } catch (error) {
-            console.error("Error reading log file:", error);
-            return null;
-        }
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+rl.on('line', (line: string) => {
+  const [botName, ...commandParts] = line.trim().split(' ');
+  console.log(commandParts)
+  // if (botName === username) {
+  executeCommand(commandParts.join(' '));
+  // }
+});
+
+const logFileName = `chat_log_${username}.txt`;
+const logStream = fs.createWriteStream(logFileName, { flags: 'a' });
+
+function createBotInstance(): void {
+  bot = createBot(botOptions);
+
+  bot.on('login', () => {
+    bot.chat(`/login ${password}`);
+    console.log(`Бот (${username}) подключился к серверу ${host}:${port || 25565}`);
+    logStream.write(`Бот (${username}) подключился к серверу ${host}:${port || 25565}\n`);
+  });
+
+  bot.on('messagestr', (message: string) => {
+    console.log(`[MESSAGE] ${message}`);
+    logStream.write(`[MESSAGE] ${message}\n`);
+  });
+
+  bot.on('error', (err: Error & { code?: string }) => {
+    console.error('Ошибка:', err);
+    logStream.write(`Ошибка: ${err}\n`);
+    if (err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED') {
+      console.log('Попытка переподключения через 5 секунд...');
+      setTimeout(createBotInstance, 5000);
     }
+  });
+
+  bot.on('end', () => {
+    console.log('Бот отключился от сервера.');
+    logStream.write('Бот отключился от сервера.\n');
+    logStream.end();
+    process.exit(0);
+  });
 }
 
-// Пример использования класса
-const logFilePath = 'D:/Desktop/mineflayer_bot/dist/Death/Death.log'; // Укажите правильный путь к вашему файлу лога
-const logReader = new LogFileReader();
-const coordinates = logReader.readCoordinatesFromLogFile(logFilePath);
-if (coordinates) {
-    console.log("Coordinates:", coordinates.toString());
-} else {
-    console.log("Failed to read coordinates from log file.");
+async function executeCommand(command: string): Promise<void> {
+  try {
+    const [cmd, ...args] = command.split(' ');
+    switch (cmd) {
+      case 'move':
+        console.log('Бот начинает движение...');
+        break;
+      case 'chat':
+        console.log(`Сообщение: ${args.join(' ')}`);
+        bot.chat(args.join(' '));
+        break;
+      case 'inventory':
+        console.log('Инвентарь бота:', bot.inventory.items());
+        break;
+      case 'online':
+        console.log('Игроки онлайн:', Object.keys(bot.players).join(', '));
+        break;
+      case 'say':
+        const message = args.join(' ');
+        console.log(`[BOT] ${username}: ${message}`);
+        bot.chat(message);
+        break;
+      case 'exit':
+        console.log('Завершение работы бота...');
+        bot.end();
+        logStream.end();
+        process.exit(0);
+      default:
+        console.log('Неизвестная команда.');
+    }
+  } catch (err) {
+    console.error('Ошибка выполнения команды:', err);
+  }
 }
 
-class ChatHandler {
-    private bot: mineflayer.Bot;
-    private movementController: MovementController;
-    private chat: ChatController;
-    private logDir: string = path.join(__dirname, 'Death','Death.log');
-    private t: Terminal;
-    private logReader: LogFileReader;
-
-    constructor(bot: mineflayer.Bot, terminal: Terminal) {
-        this.bot = bot;
-        this.logReader = new LogFileReader();
-        this.chat = new ChatController(this.bot, '');
-        this.t = terminal
-        this.movementController = new MovementController(this.bot, this.chat, terminal); // Передаем chat и terminal
-    }
-
-    public death() {
-        const coordinates = this.logReader.readCoordinatesFromLogFile(this.logDir);
-        this.t.printMessage(this.logDir)
-        this.t.printMessage(coordinates ? coordinates.toString() : "Записей о смерти нет");
-        return coordinates ? coordinates.toString() : "Записей о смерти нет";
-    }
-
-    public handleChatMessage(username: string, message: string): void {
-        const mes: string[] = message.toLowerCase().split(' ');
-        const command = mes[0];
-        console.log(`Processing command: ${command}`);
-
-        switch (command) {
-            case 'goto':
-                this.t.printMessage(`${username} ${this.movementController.gotoBlock(mes[1], mes[2], mes[3], username)}`)
-                break;
-            case 'come':
-                this.t.printMessage(`${username}, ${this.movementController.comeToPlayer(username)}`);
-                break;
-            case 'stop':
-                this.t.printMessage(`${username}, ${this.movementController.stopBot(username)}`);
-                break;
-            case 'echo':
-                const mes1: string = mes.slice(1).join(' ');
-                this.t.printMessage(mes1);
-                break;
-            case 'mine':
-                this.t.printMessage('mine');
-                break;
-            case 'health':
-                this.t.printMessage(`/msg ${username} здоровье: ${this.bot.health} насыщение: ${this.bot.food} позиция: ${this.bot.entity.position}`);
-                break;
-            case  'last':
-                switch (mes[1]) {
-                    case 'death':
-                        this.t.printMessage(this.death());
-                        break;
-                    default:
-                        this.t.printMessage(`Command '${command}' '${mes[1]}' is not recognized.`)
-                }
-                break; // Добавлено пропущенное break
-            default:
-                this.t.printMessage(`Command '${command}' is not recognized.`);
-                break;
-        }
-    }
-}
-
-class MinecraftBot {
-    public bot: mineflayer.Bot;
-    private readonly password: string;
-    private readonly username: string;
-    private readonly logFolderPath: string;
-    private readonly ch: boolean;
-    public chatHandler: ChatHandler;
-    public terminal: Terminal;
-
-    constructor(
-        username: string,
-        password: string,
-        host: string,
-        port: string | number,
-        chat_logger: boolean,
-        options?: any
-    ) {
-        this.ch = chat_logger;
-        this.username = username;
-        this.password = password;
-        this.logFolderPath = `${__dirname}/logs`;
-        this.bot = mineflayer.createBot({
-            username: username,
-            password: password,
-            host: host,
-            port: port,
-            ...options,
-        });
-
-        this.terminal = new Terminal(); // Создаем экземпляр Terminal
-
-        this.chatHandler = new ChatHandler(this.bot, this.terminal); // Передаем terminal в ChatHandler
-        this.terminal.setChatHandler(this.chatHandler); // Устанавливаем ChatHandler в Terminal
-
-        console.log('ChatHandler initialized in MinecraftBot:', this.chatHandler);
-
-        this.setupEvents();
-    }
-
-    private checkBotReady(): boolean {
-        return this.bot && typeof this.bot.chat === 'function';
-    }
-
-    public login(): void {
-        if (!this.checkBotReady()) {
-            console.log('Bot is not ready to log in');
-            return;
-        }
-        this.bot.chat(`/register ${this.password} ${this.password}`);
-        this.bot.chat(`/login ${this.password}`);
-        console.log((`Bot ${this.username} logged into the game`).blue);
-    }
-
-    private setupEvents(): void {
-        this.bot.on('chat', (username, message) => {
-            console.log(`${new Date().toISOString()} <${username}> ${message}`);
-        });
-
-        this.bot.on('spawn', () => {
-            this.login();
-        });
-
-        this.bot.on('playerJoined', (player) => {
-            console.log((`${player.username} joined the game`).yellow);
-        });
-
-        this.bot.on('death', () => {
-            console.log('DEATH');
-        });
-
-        this.bot.on('playerLeft', (player) => {
-            console.log((`${player.username} left the game`).red);
-        });
-
-        this.bot.on('whisper', (username, message) => {
-            this.chatHandler.handleChatMessage(username, message);
-        });
-
-        this.bot.once('spawn', () => {
-            this.login();
-        });
-
-        this.bot.on('goal_reached', () => {
-            console.log('Reached goal');
-        });
-    }
-}
-
-// Экспортируем классы
-export {MinecraftBot, ChatHandler};
-
-// Создание и запуск бота
-const bot = new MinecraftBot(
-    process.argv[2],
-    process.argv[3],
-    process.argv[4],
-    parseInt(process.argv[5]),
-    process.argv[6] === "true"
-);
-
-// Инициализация Terminal
-bot.terminal.printMessage('Welcome to the terminal!');
-bot.terminal.prompt();
+createBotInstance();
