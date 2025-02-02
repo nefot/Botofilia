@@ -4,7 +4,7 @@
   "description": "none",
   "main": "test_reqest.js",
   "scripts": {
-    "1": " node dist/main.js Borekci 0303708000 77.235.121.114",
+    "1": " node dist/main.js Nefot 0303708000 77.235.121.114",
     "2": " node dist/main.js Killer_IV 0303708000 77.235.121.114",
     "23": " node dist/main.js ItsMeet 0303708000 77.235.121.114",
     "234": " node dist/main.js ArtyomGodMan _Qwe1Asd2_ 77.235.121.114",
@@ -16,7 +16,7 @@
     "controler": "node dist/Controller.js",
     "build": "tsc",
     "test": "node dist/main.js archive 0303708000 77.235.121.114 25565 true",
-    "test519": " node dist/main.jsS SoulWarden 0303708000 77.235.121.114 25565 true",
+    "test519": " node dist/main.js Nefot 0303708000 77.235.121.114 25565 true",
     "test549": " node dist/Colorize.js",
     "test59": " node dist/main.js никнейм пароль адрес порт(необязательный)",
     "test5": " node dist/main.js ZombieMummy 0303708000 77.235.121.114",

@@ -1,6 +1,4 @@
 import { createBot, Bot, BotOptions } from 'mineflayer';
-import * as readline from 'readline';
-import * as fs from 'fs';
 import WebSocket from 'ws';
 
 const args: string[] = process.argv.slice(2);
@@ -19,39 +17,34 @@ const botOptions: BotOptions = {
 };
 
 let bot: Bot;
-const ws = new WebSocket('ws://localhost:8081');
+const ws = new WebSocket('ws://localhost:8080');
 
 ws.on('open', () => {
   console.log(`[${username}] Подключен к серверу команд.`);
+  // Регистрируем бота на сервере
+  ws.send(JSON.stringify({ botName: username, command: 'register' }));
 });
 
 ws.on('message', (data: WebSocket.RawData) => {
-    try {
-        const message = data.toString().trim();
-        console.log(`[${username}] Получена команда: ${message}`);
+  try {
+    const message = JSON.parse(data.toString());
+    console.log(`[${username}] Получена команда: ${message.command}`);
 
-        const [botName, ...commandParts] = message.split(' ');
-        const command = commandParts.join(' ');
-
-        if (botName === username) {
-            executeCommand(command);
-        }
-    } catch (err) {
-        console.error(`[${username}] Ошибка обработки команды:`, err);
+    if (message.command) {
+      executeCommand(message.command);
     }
+  } catch (err) {
+    console.error(`[${username}] Ошибка обработки команды:`, err);
+  }
 });
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-rl.on('line', (line: string) => {
-  const [botName, ...commandParts] = line.trim().split(' ');
-  console.log(commandParts)
-  // if (botName === username) {
-  executeCommand(commandParts.join(' '));
-  // }
+ws.on('close', () => {
+  console.log(`[${username}] Соединение с сервером команд закрыто.`);
 });
 
-const logFileName = `chat_log_${username}.txt`;
-const logStream = fs.createWriteStream(logFileName, { flags: 'a' });
+ws.on('error', (err) => {
+  console.error(`[${username}] Ошибка WebSocket:`, err);
+});
 
 function createBotInstance(): void {
   bot = createBot(botOptions);
@@ -59,28 +52,23 @@ function createBotInstance(): void {
   bot.on('login', () => {
     bot.chat(`/login ${password}`);
     console.log(`Бот (${username}) подключился к серверу ${host}:${port || 25565}`);
-    logStream.write(`Бот (${username}) подключился к серверу ${host}:${port || 25565}\n`);
+  });
+
+  bot.on('error', (err) => {
+    console.log('Ошибка:', err);
+  });
+
+  bot.on('end', (reason) => {
+    console.log(`Бот отключился: ${reason}. Переподключение через 5 секунд...`);
+    setTimeout(createBotInstance, 5000);
+  });
+
+  bot.on('kicked', (reason) => {
+    console.log(`Бот кикнут: ${reason}`);
   });
 
   bot.on('messagestr', (message: string) => {
     console.log(`[MESSAGE] ${message}`);
-    logStream.write(`[MESSAGE] ${message}\n`);
-  });
-
-  bot.on('error', (err: Error & { code?: string }) => {
-    console.error('Ошибка:', err);
-    logStream.write(`Ошибка: ${err}\n`);
-    if (err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED') {
-      console.log('Попытка переподключения через 5 секунд...');
-      setTimeout(createBotInstance, 5000);
-    }
-  });
-
-  bot.on('end', () => {
-    console.log('Бот отключился от сервера.');
-    logStream.write('Бот отключился от сервера.\n');
-    logStream.end();
-    process.exit(0);
   });
 }
 
@@ -88,9 +76,6 @@ async function executeCommand(command: string): Promise<void> {
   try {
     const [cmd, ...args] = command.split(' ');
     switch (cmd) {
-      case 'move':
-        console.log('Бот начинает движение...');
-        break;
       case 'chat':
         console.log(`Сообщение: ${args.join(' ')}`);
         bot.chat(args.join(' '));
@@ -109,7 +94,6 @@ async function executeCommand(command: string): Promise<void> {
       case 'exit':
         console.log('Завершение работы бота...');
         bot.end();
-        logStream.end();
         process.exit(0);
       default:
         console.log('Неизвестная команда.');
