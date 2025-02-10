@@ -9,7 +9,7 @@ namespace Setting {
   export let host = '77.235.121.114';
   export let password = '0303708000';
   export let port = 25565;
-  export let wsPort = 8081;
+  export let wsPort = 8080;
 }
 
 const bots: Record<string, ChildProcess> = {};
@@ -50,39 +50,5 @@ async function runScripts(): Promise<void> {
     });
   }
 }
-
-// WebSocket сервер
-const wss = new WebSocket.Server({ port: Setting.wsPort });
-
-wss.on('connection', (ws) => {
-  console.log('Клиент подключен к WebSocket-серверу.');
-
-  ws.on('message', (message) => {
-    try {
-      const text = message.toString().trim();
-      console.log(`Получено сообщение: ${text}`);
-
-      const [botName, ...commandParts] = text.split(' ');
-      const command = commandParts.join(' ');
-
-      if (bots[botName] && bots[botName].stdin) {
-        console.log(`Отправка команды боту ${botName}: ${command}`);
-        if (bots[botName]?.stdin) {
-          console.log(`Отправка команды боту ${botName}: ${command}`);
-          bots[botName].stdin!.write(command + '\n');
-        } else {
-          console.error(`Ошибка: бот ${botName} не найден или stdin отсутствует.`);
-        }
-
-      } else {
-        console.error(`Ошибка: бот ${botName} не найден или stdin отсутствует.`);
-      }
-    } catch (err) {
-      console.error('Ошибка обработки команды:', err);
-    }
-  });
-});
-
-console.log(`WebSocket-сервер запущен на порту ${Setting.wsPort}`);
 
 runScripts();

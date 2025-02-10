@@ -8,22 +8,39 @@ server.on('connection', (socket) => {
 
   socket.on('message', (data) => {
     try {
-      const message = JSON.parse(data.toString());
-      const { botName, command } = message;
+      const messageStr = data.toString().trim();
+      const [botName, ...commandParts] = messageStr.split(' ');
+      const command = commandParts.join(' ');
 
+      // Проверка регистрации бота
       if (command === 'register') {
+        if (!botName) {
+          socket.send('Ошибка: укажите <никнейм> для регистрации');
+          return;
+        }
+
         clients[botName] = socket;
         console.log(`Бот ${botName} зарегистрирован.`);
-        socket.send(JSON.stringify({ status: 'success', message: 'Регистрация успешна' }));
-      } else if (command && clients[botName]) {
-        clients[botName].send(JSON.stringify({ command }));
+        socket.send(`Бот ${botName} успешно зарегистрирован.`);
+        return;
+      }
+
+      if (!botName || !command) {
+        console.log('Ошибка: не указаны бот или команда');
+        socket.send('Ошибка: укажите <никнейм> <сообщение>');
+        return;
+      }
+
+      if (clients[botName]) {
+        console.log(`Отправка команды боту ${botName}: ${command}`);
+        clients[botName].send(command);
       } else {
-        console.log(`Неизвестная команда или бот ${botName} не найден.`);
-        socket.send(JSON.stringify({ status: 'error', message: 'Команда или бот не найдены' }));
+        console.log(`Бот ${botName} не найден.`);
+        socket.send(`Ошибка: бот ${botName} не найден.`);
       }
     } catch (err) {
       console.error('Ошибка обработки сообщения:', err);
-      socket.send(JSON.stringify({ status: 'error', message: 'Ошибка обработки сообщения' }));
+      socket.send('Ошибка обработки сообщения');
     }
   });
 
@@ -36,5 +53,6 @@ server.on('connection', (socket) => {
     }
   });
 });
+
 
 console.log('WebSocket сервер запущен на порту 8080.');

@@ -15,14 +15,11 @@
     "test2": "node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "controler": "node dist/Controller.js",
     "build": "tsc",
-    "test": "node dist/main.js archive 0303708000 77.235.121.114 25565 true",
-    "test519": " node dist/main.js Nefot 0303708000 77.235.121.114 25565 true",
-    "test549": " node dist/Colorize.js",
-    "test59": " node dist/main.js никнейм пароль адрес порт(необязательный)",
-    "test5": " node dist/main.js ZombieMummy 0303708000 77.235.121.114",
+    "archive": "node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114 25565 true",
+
     "runscript": "node dist/RunScript.js",
-    "terminal": "node dist/terminal.js",
-    "start": "node dist/server.js",
+
+    "server": "node dist/server.js",
     "wait-20": "ping 127.0.0.1 -n 21 > nul",
     "starst": "parallelshell \"npm run wait-20 && npm run test\" \"npm run wait-20 && npm run test1\" \"npm run wait-20 && npm run test2\" \"npm run wait-20 && npm run test3\" \"npm run wait-20 && npm run test4\" \"npm run wait-20 && npm run test5\" \"npm run wait-20 && npm run test6\" \"npm run wait-20 && npm run test7\" \"npm run wait-20 && npm run test8\" \"npm run wait-20 && npm run test9\" \"npm run wait-20 && npm run test10\" \"npm run wait-20 && npm run test11\" \"npm run wait-20 && npm run test12\" \"npm run wait-20 && npm run test53\" \"npm run wait-20 && npm run test36\" \"npm run wait-20 && npm run test73\" \"npm run wait-20 && npm run test83\" \"npm run wait-20 && npm run test93\" \"npm run wait-20 && npm run test130\" \"npm run wait-20 && npm run test131\" \"npm run wait-20 && npm run test132\""
   },
