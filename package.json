@@ -4,39 +4,29 @@
   "description": "none",
   "main": "test_reqest.js",
   "scripts": {
-    "1": " node dist/main.js Nefot 0303708000 77.235.121.114",
-    "2": " node dist/main.js Killer_IV 0303708000 77.235.121.114",
-    "23": " node dist/main.js ItsMeet 0303708000 77.235.121.114",
-    "234": " node dist/main.js ArtyomGodMan _Qwe1Asd2_ 77.235.121.114",
-    "235": " node dist/main.js ManiSSar 0303708000 77.235.121.114",
-    "236": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
-    "237": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
-    "238": " node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114",
-    "test2": "node dist/main.js ZombieMummy 0303708000 77.235.121.114",
-    "controler": "node dist/Controller.js",
+    "MAKE_ARTYOMOVSK_GREAT_AGAIN": " node dist/main.js MAKE_ARTYOMOVSK_GREAT_AGAIN 0303708000 77.235.121.114",
+    "ZOKKA_PIDOR": " node dist/main.js ZOKKA_PIDOR 0303708000 77.235.121.114",
+    "SoulWarden": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
+    "ZombieMummy": "node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "build": "tsc",
-    "archive": "node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114 25565 true",
-
+    "ARTYOM_BETER_": "node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114 25565 true",
+    "archive": "ts-node src/main.ts  archive 0303708000 77.235.121.114 25565 true",
     "runscript": "node dist/RunScript.js",
-
-    "server": "node dist/server.js",
-    "wait-20": "ping 127.0.0.1 -n 21 > nul",
-    "starst": "parallelshell \"npm run wait-20 && npm run test\" \"npm run wait-20 && npm run test1\" \"npm run wait-20 && npm run test2\" \"npm run wait-20 && npm run test3\" \"npm run wait-20 && npm run test4\" \"npm run wait-20 && npm run test5\" \"npm run wait-20 && npm run test6\" \"npm run wait-20 && npm run test7\" \"npm run wait-20 && npm run test8\" \"npm run wait-20 && npm run test9\" \"npm run wait-20 && npm run test10\" \"npm run wait-20 && npm run test11\" \"npm run wait-20 && npm run test12\" \"npm run wait-20 && npm run test53\" \"npm run wait-20 && npm run test36\" \"npm run wait-20 && npm run test73\" \"npm run wait-20 && npm run test83\" \"npm run wait-20 && npm run test93\" \"npm run wait-20 && npm run test130\" \"npm run wait-20 && npm run test131\" \"npm run wait-20 && npm run test132\""
+    "server": "node dist/server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cli-color": "^2.0.4",
     "colorts": "^0.1.63",
-    "express": "^4.18.2",
-    "mineflayer": "^4.0.0",
-    "mineflayer-auto-eat": "^3.3.6",
+    "express": "^4.21.2",
+    "mineflayer": "^4.26.0",
+    "mineflayer-auto-eat": "^5.0.0",
     "mineflayer-movement": "^0.4.4",
     "mineflayer-pathfinder": "^2.4.5",
-
     "npm-run-all": "^4.1.5",
     "punycode": "^2.3.1",
-    "terminate": "^2.6.1",
+    "terminate": "^2.8.0",
     "vec3": "^0.1.10",
     "websocket": "^1.0.35",
     "ws": "^8.18.0",
@@ -44,13 +34,13 @@
   },
   "devDependencies": {
     "@types/cli-color": "^2.0.6",
-    "@types/node": "^20.11.24",
+    "@types/node": "^22.13.1",
     "@types/ws": "^8.5.14",
-    "concurrently": "^8.2.2",
-    "mocha": "^10.3.0",
-    "parallelshell": "^3.0.1",
+    "concurrently": "^9.1.2",
+    "mocha": "^11.1.0",
+    "parallelshell": "^3.0.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.3"
   },
   "dev": "concurrently --kill-others \"npm run test1\" \"npm run test2\""
 }
