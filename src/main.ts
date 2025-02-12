@@ -64,7 +64,7 @@ function createBotInstance(): void {
 }
 
 // Функция для инициализации WebSocket
-let ws: WebSocket;
+
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
 
