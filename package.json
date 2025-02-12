@@ -9,16 +9,18 @@
     "SoulWarden": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
     "ZombieMummy": "node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "build": "tsc",
-    "ARTYOM_BETER_": "node dist/main.js ARTYOM_BETER_ 0303708000 77.235.121.114 25565 true",
+    "ARTYOM_BETER_": "ts-node src/main.ts ARTYOM_BETER_ 0303708000 77.235.121.114 25565 true",
     "archive": "ts-node src/main.ts  archive 0303708000 77.235.121.114 25565 true",
     "runscript": "node dist/RunScript.js",
-    "server": "node dist/server.js"
+    "server": "ts-node  src/server.ts ",
+    "logCleaner": "ts-node  src/logCleaner.ts "
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cli-color": "^2.0.4",
     "colorts": "^0.1.63",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mineflayer": "^4.26.0",
     "mineflayer-auto-eat": "^5.0.0",

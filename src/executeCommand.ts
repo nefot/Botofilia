@@ -1,9 +1,19 @@
-import {Bot} from 'mineflayer';
 import {Logger} from './logger';
-import {createBot} from 'mineflayer'
-import {pathfinder, Movements, goals} from 'mineflayer-pathfinder'
 
-const {GoalBlock} = goals
+
+/////////////////////////////////
+
+
+import mineflayer from 'mineflayer';
+import {pathfinder, Movements, goals} from 'mineflayer-pathfinder';
+import {Bot} from 'mineflayer';
+import minecraftData from 'minecraft-data';
+
+const {GoalNear, GoalBlock, GoalFollow} = goals;
+
+
+////////////////////////////////////
+
 
 type CommandHandler = (args: string[], logger: Logger, bot: Bot) => Promise<void>;
 
@@ -14,66 +24,65 @@ const commandHandlers: Record<string, CommandHandler> = {
     async chat(args, logger, bot) {
         const message = args.join(' ');
         if (!message) {
-            logger.logEvent('Сообщение для команды chat пустое.');
             return;
         }
         bot.chat(message);
-        logger.logEvent(`Бот отправил сообщение: ${message}`);
+
     },
 
     async inventory(_, logger, bot) {
-        logger.logEvent('Инвентарь бота: ' + JSON.stringify(bot.inventory.items()));
+        console.log('Инвентарь бота: ' + JSON.stringify(bot.inventory.items()));
     },
 
     async online(_, logger, bot) {
-        logger.logEvent('Игроки онлайн: ' + Object.keys(bot.players).join(', '));
+        console.log('Игроки онлайн: ' + Object.keys(bot.players).join(', '));
     },
-    async move(args, logger, bot) {
+    async move(args: string[], logger: Logger, bot: Bot): Promise<void> {
+        if (!bot.hasPlugin(pathfinder)) {
+            bot.loadPlugin(pathfinder);
+        }
         if (args.length < 3) {
-            logger.logEvent('Недостаточно аргументов для команды move. Использование: move <x> <y> <z> [track]');
+            logger.logEvent("Недостаточно аргументов. Укажите координаты x, y, z.");
             return;
         }
 
-        const x = parseFloat(args[0]);
-        const y = parseFloat(args[1]);
-        const z = parseFloat(args[2]);
-        const trackPosition = args.includes('track');
+        const x = parseInt(args[0]);
+        const y = parseInt(args[1]);
+        const z = parseInt(args[2]);
+        console.log(x, y, z);
+        const track = args.length > 3 && args[3] === "track";
 
         if (isNaN(x) || isNaN(y) || isNaN(z)) {
-            logger.logEvent('Неверные координаты для команды move. Убедитесь, что введены числа.');
+            logger.logEvent("Некорректные координаты. Должны быть числа.");
             return;
         }
 
-        logger.logEvent(`Бот начинает движение к координатам x:${x} y:${y} z:${z}`);
+
+        const customMoves = new Movements(bot);
+
+        bot.pathfinder.setGoal(null);
+        bot.pathfinder.setMovements(customMoves);
+
+        await new Promise(resolve => setTimeout(resolve, 100)); // небольшая задержка
 
 
-        bot.loadPlugin(pathfinder)
-        const defaultMovements = new Movements(bot)
-        bot.pathfinder.setMovements(defaultMovements)
-        const goal = new GoalBlock(x, y, z)
-        bot.pathfinder.goto(goal).then(() => {
-            bot.chat('Прибыл в точку!')
-        }).catch(err => {
-            bot.chat(`Ошибка: ${err.message}`)
-        })
+        bot.pathfinder.setGoal(new GoalNear(x, y, z, 1))
+        // console.log(bot.pathfinder.getPathTo(customMoves, new GoalNear(x,y,z,1)))
 
-        if (trackPosition) {
-            const interval = setInterval(() => {
-                const position = bot.entity.position;
-                console.log(`\x1b[34mТекущее местоположение: x:${position.x.toFixed(2)} y:${position.y.toFixed(2)} z:${position.z.toFixed(2)}\x1b[0m`);
-            }, 5000);
+        bot.once("goal_reached" as any, () => {
+            logger.logEvent(`Бот достиг цели: (${x}, ${y}, ${z}).`);
+        });
 
-            bot.once('goal_reached', () => {
-                clearInterval(interval);
-                logger.logEvent('Бот достиг цели.');
-            });
+        bot.once("path_reset" as any, () => {
+            logger.logEvent("Путь сброшен, движение отменено.");
+        });
 
-            bot.once('path_reset', () => {
-                clearInterval(interval);
-                logger.logEvent('Путь сброшен. Бот остановлен.');
-            });
-        }
+        bot.on('path_update', (r) => {
+            console.log(`Статус пути: ${r.status}, Оставшееся расстояние: ${r.path.length}`);
+        });
+
     },
+
 
     async health(args, logger, bot) {
         const healthHearts = Math.round(bot.health / 2);
@@ -84,6 +93,7 @@ const commandHandlers: Record<string, CommandHandler> = {
         const statusGraphical = `Health: ${healthBar}\nFood: ${foodBar}\nExp: ${exp.toFixed(1)}`;
         const statusText = `Health: ${bot.health}/20, Food: ${bot.food}/20, Exp: ${exp.toFixed(1)}`;
         const output = args.includes('simple') ? statusText : statusGraphical;
+        console.log(`Текущая позиция: (${bot.entity.position.x.toFixed(2)}, ${bot.entity.position.y.toFixed(2)}, ${bot.entity.position.z.toFixed(2)})`);
 
         if (args.includes('log')) {
             logger.logEvent(output);
@@ -96,16 +106,16 @@ const commandHandlers: Record<string, CommandHandler> = {
         const message = args.join(' ');
 
         if (!message) {
-            logger.logEvent('Сообщение для команды say пустое.');
+            console.log('Сообщение для команды say пустое.');
             return;
         }
 
         bot.chat(message);
-        logger.logEvent(`Бот сказал: ${message}`);
+
     },
 
     async exit(_, logger, bot) {
-        logger.logEvent('Завершение работы бота...');
+        console.log('Завершение работы бота...');
         bot.end();
         process.exit(0);
     },
@@ -117,12 +127,12 @@ export async function executeCommand(command: string, logger: Logger, bot: Bot):
         const handler = commandHandlers[cmd];
 
         if (!handler) {
-            logger.logEvent('Неизвестная команда.');
+            console.log('Неизвестная команда.');
             return;
         }
 
         await handler(args, logger, bot);
-        logger.logEvent(`Команда '${cmd}' успешно выполнена.`);
+        console.log(`Команда '${cmd}' успешно выполнена.`);
     } catch (err) {
         logger.error(`Ошибка выполнения команды: ${err}`);
     }

@@ -1,3 +1,4 @@
+
 import {Bot, BotOptions, createBot} from 'mineflayer';
 import WebSocket from 'ws';
 import {Logger} from './logger';
