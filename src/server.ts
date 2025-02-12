@@ -56,3 +56,5 @@ server.on('connection', (socket) => {
 
 
 console.log('WebSocket сервер запущен на порту 8080.');
+
+

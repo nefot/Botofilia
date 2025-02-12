@@ -13,7 +13,9 @@
     "archive": "ts-node src/main.ts  archive 0303708000 77.235.121.114 25565 true",
     "runscript": "node dist/RunScript.js",
     "server": "ts-node  src/server.ts ",
-    "logCleaner": "ts-node  src/logCleaner.ts "
+    "logCleaner": "ts-node  src/logCleaner.ts ",
+    "checkServerStatus": "ts-node  src/checkServerStatus.ts ",
+    "visual": "ts-node  src/visual.ts "
   },
   "author": "",
   "license": "ISC",
