@@ -70,7 +70,7 @@ const maxReconnectAttempts = 5;
 
 function initializeWebSocket(): void {
     // Определяем URL сервера: основной или резервный
-    const wsUrl = reconnectAttempts === 0 ? Settings.wsUrl : 'ws://192.168.134.221:8080';
+    const wsUrl = reconnectAttempts === 0 ? Settings.wsUrl : 'ws://192.168.134.1:8080';
     ws = new WebSocket(wsUrl);
 
     ws.on('open', () => {
