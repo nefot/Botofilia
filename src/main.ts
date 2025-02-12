@@ -62,14 +62,19 @@ function createBotInstance(): void {
         logger.logEvent(`Игрок ${player.username} покинул игру`);
     });
 }
+
+// Функция для инициализации WebSocket
+let ws: WebSocket;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
-// Функция для инициализации WebSocket
+
 function initializeWebSocket(): void {
-    ws = new WebSocket(Settings.wsUrl);
+    // Определяем URL сервера: основной или резервный
+    const wsUrl = reconnectAttempts === 0 ? Settings.wsUrl : 'ws://192.168.134.221:8080';
+    ws = new WebSocket(wsUrl);
 
     ws.on('open', () => {
-        logger.logEvent(`Подключен к серверу команд.`);
+        logger.logEvent(`Подключен к серверу команд: ${wsUrl}`);
         reconnectAttempts = 0; // Сброс счетчика попыток переподключения
         ws.send(`${Settings.username} register`);
     });
@@ -95,7 +100,7 @@ function initializeWebSocket(): void {
             reconnectAttempts++;
             setTimeout(() => {
                 logger.logEvent(`Попытка переподключения #${reconnectAttempts}...`);
-                initializeWebSocket();
+                initializeWebSocket(); // Повторная инициализация WebSocket
             }, 5000); // Задержка перед повторным подключением
         } else {
             logger.error(`Превышено максимальное количество попыток переподключения.`);
