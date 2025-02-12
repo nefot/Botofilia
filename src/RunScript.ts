@@ -26,7 +26,7 @@ function readNamesFromFile(filename: string): string[] {
 
 async function runScripts(): Promise<void> {
   for (const botName of Setting.names) {
-    const script = `node dist/main.js ${botName} ${Setting.password} ${Setting.host} ${Setting.port}`;
+    const script = `ts-node src/main.ts ${botName} ${Setting.password} ${Setting.host} ${Setting.port}`;
 
     if (bots[botName]) {
       console.log(`Бот ${botName} уже запущен!`);

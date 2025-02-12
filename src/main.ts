@@ -1,4 +1,3 @@
-
 import {Bot, BotOptions, createBot} from 'mineflayer';
 import WebSocket from 'ws';
 import {Logger} from './logger';
@@ -67,7 +66,7 @@ function createBotInstance(): void {
 // Функция для инициализации WebSocket
 function initializeWebSocket(): void {
     ws = new WebSocket(Settings.wsUrl);
-
+    let n = false
     ws.on('open', () => {
         logger.logEvent(`Подключен к серверу команд.`);
         ws.send(`${Settings.username} register`);
@@ -89,6 +88,13 @@ function initializeWebSocket(): void {
 
     ws.on('close', () => {
         logger.logEvent(`Соединение с сервером команд закрыто.`);
+
+        if (!n) {
+            ws = new WebSocket('ws://192.168.134.221:8080')
+
+            initializeWebSocket()
+            n = true
+        }
     });
 
     ws.on('error', (err) => {
