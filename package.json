@@ -4,6 +4,9 @@
   "description": "none",
   "main": "test_reqest.js",
   "scripts": {
+
+    "postinstall": "patch-package",
+
     "MAKE_ARTYOMOVSK_GREAT_AGAIN": " node dist/main.js MAKE_ARTYOMOVSK_GREAT_AGAIN 0303708000 77.235.121.114",
     "ZOKKA_PIDOR": " node dist/main.js ZOKKA_PIDOR 0303708000 77.235.121.114",
     "SoulWarden": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
@@ -43,6 +46,7 @@
     "concurrently": "^9.1.2",
     "mocha": "^11.1.0",
     "parallelshell": "^3.0.2",
+    "patch-package": "^8.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   },
