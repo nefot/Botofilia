@@ -20,14 +20,38 @@ async function sendToBot(data: { online: number; max: number; players: string[] 
 }
 
 function getLogPaths() {
+    // Текущая дата и время в UTC
     const now = new Date();
-    const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    const day = String(now.getDate()).padStart(2, '0');
+
+    // Московское время (UTC+3)
+    const moscowOffset = 3 * 60 * 60 * 1000; // +3 часа в миллисекундах
+    const moscowTime = new Date(now.getTime() + moscowOffset);
+
+    // Форматируем дату: день.месяц.год
+    const day = String(moscowTime.getUTCDate()).padStart(2, '0');
+    const month = String(moscowTime.getUTCMonth() + 1).padStart(2, '0');
+    const year = moscowTime.getUTCFullYear();
+    const formattedDate = `${day}.${month}.${year}`;
+
+    // Форматируем время: часы:минуты:секунды
+    const hours = String(moscowTime.getUTCHours()).padStart(2, '0');
+    const minutes = String(moscowTime.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(moscowTime.getUTCSeconds()).padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+    // Для пути логов (год-месяц)
+    const yearMonth = `${year}-${month}`;
     const logDir = path.join(LOGS_BASE, yearMonth);
     const logFile = path.join(logDir, `${day}.log`);
-    return {logDir, logFile, timestamp: now.toISOString()};
-}
 
+    return {
+        logDir,
+        logFile,
+        date: formattedDate,  // "день.месяц.год"
+        time: formattedTime,  // "часы:минуты:секунды"
+        timestamp: `${formattedDate} ${formattedTime}`  // "день.месяц.год часы:минуты:секунды"
+    };
+}
 function writeLog(filePath: string, content: string) {
     fs.appendFileSync(filePath, content + '\n', 'utf8');
 }

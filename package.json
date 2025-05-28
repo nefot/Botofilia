@@ -4,22 +4,16 @@
   "description": "none",
   "main": "test_reqest.js",
   "scripts": {
-
     "postinstall": "patch-package",
-
     "MAKE_ARTYOMOVSK_GREAT_AGAIN": " node dist/main.js MAKE_ARTYOMOVSK_GREAT_AGAIN 0303708000 77.235.121.114",
     "ZOKKA_PIDOR": " node dist/main.js ZOKKA_PIDOR 0303708000 77.235.121.114",
     "SoulWarden": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
     "ZombieMummy": "node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "build": "tsc",
-
     "ARTYOM_BETER_": "ts-node src/main.ts MrsDeN4ik 0303708000 77.235.121.114 25565 true",
-
     "最好的": "ts-node src/main.ts Trump 0303708000 77.235.121.114 25565 true",
-        "最好的2": "ts-node src/main.ts BirchCraft _YmeoText27_ 77.235.121.114 25565 true",
-
+    "最好的2": "ts-node src/main.ts BirchCraft _YmeoText27_ 77.235.121.114 25565 true",
     "nefot_bot": "ts-node src/main.ts nefot_bot 0303708000 77.235.121.114 25565 true",
-
     "archive": "ts-node src/main.ts nefo 0303708000 77.235.121.114 25565 true",
     "runscr2ipt": "ts-node src/RunScript.ts",
     "server": "ts-node  src/server.ts ",
@@ -34,6 +28,7 @@
     "colorts": "^0.1.63",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "luxon": "^3.6.1",
     "mineflayer": "^4.26.0",
     "mineflayer-auto-eat": "^5.0.0",
     "mineflayer-movement": "^0.4.4",
