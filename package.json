@@ -12,8 +12,15 @@
     "SoulWarden": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
     "ZombieMummy": "node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "build": "tsc",
-    "ARTYOM_BETER_": "ts-node src/main.ts ARTYOM_BETER_ 0303708000 77.235.121.114 25565 true",
-    "archive": "ts-node src/main.ts  archive 0303708000 77.235.121.114 25565 true",
+
+    "ARTYOM_BETER_": "ts-node src/main.ts MrsDeN4ik 0303708000 77.235.121.114 25565 true",
+
+    "最好的": "ts-node src/main.ts Trump 0303708000 77.235.121.114 25565 true",
+        "最好的2": "ts-node src/main.ts BirchCraft _YmeoText27_ 77.235.121.114 25565 true",
+
+    "nefot_bot": "ts-node src/main.ts nefot_bot 0303708000 77.235.121.114 25565 true",
+
+    "archive": "ts-node src/main.ts nefo 0303708000 77.235.121.114 25565 true",
     "runscr2ipt": "ts-node src/RunScript.ts",
     "server": "ts-node  src/server.ts ",
     "logCleaner": "ts-node  src/logCleaner.ts ",
