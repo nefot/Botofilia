@@ -1,202 +1,164 @@
-import {Bot, BotOptions, createBot} from 'mineflayer';
+import { Bot, BotOptions, createBot } from 'mineflayer';
 import WebSocket from 'ws';
-import {Logger} from './logger';
-import {executeCommand} from './executeCommand';
-import {sendChatEvent} from './sendChat';
-// Неймспейс с настройками
+import { Logger } from './logger';
+import { executeCommand } from './executeCommand';
+
+/**
+ * Namespace for configuration and settings
+ */
 namespace Settings {
-    export const args: string[] = process.argv.slice(2);
-    export const [username, password, host, port] = args;
-    export const botOptions: BotOptions = {
-        host,
-        port: port ? parseInt(port) : 25565,
-        username,
-        password,
-        version: '1.21.4',
-    };
-    export const wsUrl: string = 'ws://localhost:8080';
+  export const args: string[] = process.argv.slice(2);
+  export const [username, password, host, portRaw] = args;
+  export const port: number = portRaw ? parseInt(portRaw, 10) : 25565;
+  export const botOptions: BotOptions = {
+    host,
+    port,
+    username,
+    password,
+    version: '1.21.4',
+  };
+  export const wsUrls: string[] = [
+    'ws://localhost:8080',
+    'ws://192.168.134.221:8080',
+  ];
 }
 
 const logger = new Logger(Settings.username);
-let bot: Bot;
-let ws: WebSocket;
-let chatSocket: WebSocket;
+let bot: Bot | null = null;
+let ws: WebSocket | null = null;
 
+let botReconnectTimeout: NodeJS.Timeout;
+let wsReconnectTimeout: NodeJS.Timeout;
+let loginTimeout: NodeJS.Timeout;
+
+/**
+ * Safely destroy existing bot instance and clear timeouts
+ */
+function destroyBot(): void {
+  if (bot) {
+    bot.removeAllListeners();
+    try { bot.quit(); } catch {};
+    bot = null;
+  }
+  clearTimeout(botReconnectTimeout);
+  clearTimeout(loginTimeout);
+}
+
+/**
+ * Create and initialize the Mineflayer bot
+ */
 function createBotInstance(): void {
+  destroyBot();
+  bot = createBot(Settings.botOptions);
 
-    bot = createBot(Settings.botOptions);
-
-    bot.on('login', () =>
-    {
-        bot.chat(`/register ${Settings.password} ${Settings.password}`);
+  bot.once('login', () => {
+    // Attempt registration then login
+    bot!.chat(`/register ${Settings.password} ${Settings.password}`);
+    // Schedule login after server processes registration
+    clearTimeout(loginTimeout);
+    loginTimeout = setTimeout(() => {
+      if (bot) {
         bot.chat(`/login ${Settings.password}`);
-        logger.logEvent(`Бот подключился к серверу ${Settings.host}:${Settings.botOptions.port}`);
-    });
+      }
+    }, 1000);
+    logger.logEvent(`Bot connected to ${Settings.botOptions.host}:${Settings.botOptions.port}`);
+  });
 
-    bot.on('error', (err) =>
-    {
-        logger.error(`Ошибка: ${err}`);
-    });
+  bot.on('end', (reason) => {
+    logger.error(`Bot disconnected (${reason}). Reconnecting in 5s...`);
+    destroyBot();
+    botReconnectTimeout = setTimeout(createBotInstance, 7000);
+  });
 
-    bot.on('end', (reason) =>
-    {
-        logger.logEvent(`Бот отключился: ${reason}. Переподключение через 5 секунд...`);
-        setTimeout(createBotInstance, 5000);
-    });
+  bot.on('error', (err) => {
+    logger.error(`Bot error: ${err}. Reconnecting in 5s...`);
+    bot?.end();
+  });
 
-    bot.on('kicked', (reason) =>
-    {
-        logger.error(`Бот кикнут: ${reason}`);
-    });
+  bot.on('kicked', (reason) => {
+    logger.error(`Bot was kicked (${reason}). Reconnecting in 5s...`);
+    bot?.end();
+  });
 
-    bot.on('messagestr', (message: string) =>
-    {
-        const match = message.match(/<([^>]+)> (.+)/);
-        if (match)
-            {
-                const [, player, msg] = match;
-                logger.logMessage(player, msg);
-                const msg1 = {
-                    event: false,
-                    data: Date.now(),
-                    player: player,
-                    message: msg,
-                };
+  bot.on('message', (message) => {
+    const text = message.toString();
+    const match = text.match(/^<([^>]+)>\s*(.+)$/);
+    if (match) {
+      const [, player, msg] = match;
+      logger.logMessage(player, msg);
+    } else {
+      logger.logEvent(text);
+    }
+  });
 
-                sendChatEvent('ws://localhost:9000', msg1);
-            }
-        else
-            {
-                logger.logEvent(message);
-            }
-    });
+  bot.on('playerJoined', (player) => {
+    logger.logEvent(`Player joined: ${player.username}`);
+  });
 
-    bot.on('playerJoined', (player) =>
-    {
-        logger.logEvent(`Игрок ${player.username} подключился к игре`);
-        const msg1 = {
-            event: true,
-            data: Date.now(),
-            player: '-1',
-            message: `Игрок ${player.username} подключился к игре`,
-        };
-
-        sendChatEvent('ws://localhost:9000', msg1);
-    });
-
-    bot.on('playerLeft', (player) =>
-    {
-        logger.logEvent(`Игрок ${player.username} покинул игру`);
-        const msg1 = {
-            event: true,
-            data: Date.now(),
-            player: '-1',
-            message: `Игрок ${player.username} покинул к игре`,
-        };
-
-        sendChatEvent('ws://localhost:9000', msg1);
-    });
+  bot.on('playerLeft', (player) => {
+    logger.logEvent(`Player left: ${player.username}`);
+  });
 }
 
-// Функция для инициализации WebSocket
-
-let reconnectAttempts = 0;
-const maxReconnectAttempts = 5;
-function initializeChatWebSocket(): void {
-    chatSocket = new WebSocket('ws://localhost:9000');
-
-    chatSocket.on('open', () => {
-        logger.logEvent('Подключение к WebSocket чату установлено');
-
-    });
-
-    chatSocket.on('message', (data) => {
-        try {
-            const msg = JSON.parse(data.toString());
-            if (msg.type === 'chat_from_tg') {
-                const from = msg.author;
-                const text = msg.text;
-                bot.chat(`<${from}> ${text}`);
-            }
-        } catch (err) {
-            logger.error(`Ошибка разбора сообщения от TG: ${err}`);
-        }
-    });
-
-    chatSocket.on('close', () => {
-        logger.logEvent('Чат WebSocket закрыт, переподключение через 5с...');
-        setTimeout(initializeChatWebSocket, 5000);
-    });
-
-    chatSocket.on('error', (err) => {
-        logger.error(`Ошибка в чат WebSocket: ${err}`);
-    });
-}
-
+/**
+ * Initialize or reconnect the WebSocket connection
+ */
+let wsAttempt = 0;
 function initializeWebSocket(): void {
-    // Определяем URL сервера: основной или резервный
-    const wsUrl = reconnectAttempts === 0 ? Settings.wsUrl : 'ws://192.168.134.221:8080';
-    ws = new WebSocket(wsUrl);
+  if (ws) {
+    ws.removeAllListeners();
+    ws.terminate();
+    ws = null;
+  }
 
-    ws.on('open', () => {
-        logger.logEvent(`Подключен к серверу команд: ${wsUrl}`);
-        reconnectAttempts = 0; // Сброс счетчика попыток переподключения
-        ws.send(`${Settings.username} register`);
-    });
+  const url = Settings.wsUrls[wsAttempt % Settings.wsUrls.length];
+  ws = new WebSocket(url);
 
+  ws.on('open', () => {
+    logger.logEvent(`WebSocket connected to ${url}`);
+    wsAttempt = 0;
+    ws!.send(`${Settings.username} register`);
+  });
 
-    ws.on('message', (data: WebSocket.RawData) => {
-        try {
-            const message = data.toString().trim();
-            if (message.startsWith('Ошибка:')) {
-                logger.error(`Игнорируем сообщение сервера: ${message}`);
-                return;
-            }
-            executeCommand(message, logger, bot);
+  ws.on('message', (data) => {
+    const msg = data.toString().trim();
+    if (msg.startsWith('Ошибка:')) {
+      logger.error(`Ignored server message: ${msg}`);
+      return;
+    }
+    try {
+      executeCommand(msg, logger, bot!);
+    } catch (err) {
+      logger.error(`Command handling error: ${err}`);
+    }
+  });
 
-        } catch (err) {
-            logger.error(`Ошибка обработки команды: ${err}`);
-        }
-    });
+  ws.on('close', () => {
+    logger.error(`WebSocket closed. Reconnecting in 5s...`);
+    clearTimeout(wsReconnectTimeout);
+    wsReconnectTimeout = setTimeout(() => {
+      wsAttempt++;
+      initializeWebSocket();
+    }, 7000);
+  });
 
-    ws.on('close', () =>
-    {
-        logger.logEvent(`Соединение с сервером команд закрыто.`);
-
-        if (reconnectAttempts < maxReconnectAttempts)
-            {
-                reconnectAttempts++;
-                setTimeout(() =>
-                {
-                    logger.logEvent(`Попытка переподключения #${reconnectAttempts}...`);
-                    initializeWebSocket(); // Повторная инициализация WebSocket
-                }, 5000); // Задержка перед повторным подключением
-            }
-        else
-            {
-                logger.error(`Превышено максимальное количество попыток переподключения.`);
-            }
-    });
-
-    ws.on('error', (err) =>
-    {
-        logger.error(`Ошибка WebSocket: ${err}`);
-    });
+  ws.on('error', (err) => {
+    logger.error(`WebSocket error: ${err}`);
+    ws?.terminate();
+  });
 }
 
-// Основная функция для запуска бота
+/**
+ * Application entry point
+ */
 function main(): void {
-    if (Settings.args.length < 3)
-        {
-            console.error('Использование: node main.ts <никнейм> <пароль> <адрес> [порт]');
-            process.exit(1);
-        }
+  if (Settings.args.length < 3) {
+    console.error('Usage: node main.ts <username> <password> <host> [port]');
+    process.exit(1);
+  }
 
-    createBotInstance();
-    initializeWebSocket();
-    initializeChatWebSocket();
-
+  createBotInstance();
+  initializeWebSocket();
 }
 
-// Запуск программы
 main();
