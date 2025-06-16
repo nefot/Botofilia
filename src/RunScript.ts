@@ -34,7 +34,7 @@ async function runScripts(): Promise<void> {
     }
 
     console.log(`Ожидание 5 секунд перед запуском бота ${botName}...`);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 7000));
 
     const childProcess = spawn(script, { shell: true, stdio: ['pipe', 'pipe', 'pipe'] });
     bots[botName] = childProcess;
