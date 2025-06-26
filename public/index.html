@@ -1,0 +1,38 @@
+<h2>Создание бота</h2>
+<form id="register-form">
+  <input name="username" placeholder="Никнейм" required />
+  <input name="password" placeholder="Пароль" required />
+  <input name="host" placeholder="Сервер (IP или хост)" value="localhost" required />
+  <input name="port" type="number" value="25565" required />
+  <button>Создать</button>
+</form>
+
+<h2>Активные боты:</h2>
+<ul id="bot-list"></ul>
+
+<script>
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const data = Object.fromEntries(form.entries());
+    data.port = parseInt(data.port);
+
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.text();
+    alert('Бот создан: ' + result);
+    loadBots();
+  });
+
+  async function loadBots() {
+    const res = await fetch('/api/bots');
+    const bots = await res.json();
+    document.getElementById('bot-list').innerHTML = bots.map(b => `<li>${b}</li>`).join('');
+  }
+
+  loadBots();
+</script>
