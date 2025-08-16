@@ -12,7 +12,7 @@ namespace Settings {
         port: port ? parseInt(port) : 25565,
         username,
         password,
-        version: '1.21.4',
+        version: '1.21.6',
     };
     export const wsUrl: string = 'ws://localhost:8080';
 }
