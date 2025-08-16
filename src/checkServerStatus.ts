@@ -59,7 +59,7 @@ function addHourlySeparator() {
 }
 
 // Запуск проверки сервера каждые 10 секунд
-setInterval(() => checkServerStatus('77.235.121.114', 25565), 10 * 1000);
+setInterval(() => checkServerStatus('birchcraft.hopto.org', 25565), 10 * 1000);
 
 // Запуск добавления разделителя каждый час
 setInterval(addHourlySeparator, 60 * 60 * 1000);
