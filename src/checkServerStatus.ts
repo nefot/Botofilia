@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as mc from 'minecraft-protocol';
 import axios from 'axios';
 
-const HOST = '77.235.121.114';
+const HOST = 'birchcraft.hopto.org';
 const PORT = 25565;
 const LOGS_BASE = path.join(__dirname, 'logs');
 
