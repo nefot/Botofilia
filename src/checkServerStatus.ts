@@ -2,15 +2,24 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mc from 'minecraft-protocol';
 
+interface ExtendedPingOptions {
+  host: string;
+  port: number;
+  timeout?: number;  // ← теперь timeout разрешён
+}
+
 async function checkServerStatus(host: string, port: number = 25565) {
     let response;
 
     try {
-        // Основной вызов ping
-        response = await mc.ping({ host, port, timeout: 10000 }); // таймаут 10 сек
+        response = await mc.ping({
+            host,
+            port,
+            timeout: 10000  // ✅ Теперь TypeScript пропустит
+        } as ExtendedPingOptions);
     } catch (error: any) {
         console.error(`Ошибка при пинге сервера ${host}:${port}:`, error.message || error);
-        return; // выходим, если ошибка сети/таймаут
+        return;
     }
 
     // 🔴 Проверяем, что response — это объект, а не null
