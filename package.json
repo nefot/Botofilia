@@ -4,9 +4,7 @@
   "description": "none",
   "main": "test_reqest.js",
   "scripts": {
-
     "postinstall": "patch-package",
-
     "MAKE_ARTYOMOVSK_GREAT_AGAIN": " node dist/main.js MAKE_ARTYOMOVSK_GREAT_AGAIN 0303708000 77.235.121.114",
     "ZOKKA_PIDOR": " node dist/main.js ZOKKA_PIDOR 0303708000 77.235.121.114",
     "SoulWarden": " node dist/main.js SoulWarden 0303708000 77.235.121.114",
@@ -26,29 +24,29 @@
     "cli-color": "^2.0.4",
     "colorts": "^0.1.63",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "mineflayer": "^4.26.0",
+    "express": "5.1.0",
+    "mineflayer": "4.29.0",
     "mineflayer-auto-eat": "^5.0.0",
     "mineflayer-movement": "^0.4.4",
-    "mineflayer-pathfinder": "^2.4.5",
+    "mineflayer-pathfinder": "2.4.5",
     "npm-run-all": "^4.1.5",
-    "punycode": "^2.3.1",
+    "punycode": "2.3.1",
     "terminate": "^2.8.0",
-    "vec3": "^0.1.10",
+    "vec3": "0.1.10",
     "websocket": "^1.0.35",
-    "ws": "^8.18.0",
+    "ws": "8.18.2",
     "wscat": "^6.0.1"
   },
   "devDependencies": {
     "@types/cli-color": "^2.0.6",
-    "@types/node": "^22.13.1",
-    "@types/ws": "^8.5.14",
+    "@types/node": "22.15.33",
+    "@types/ws": "8.18.1",
     "concurrently": "^9.1.2",
     "mocha": "^11.1.0",
     "parallelshell": "^3.0.2",
     "patch-package": "^8.0.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "ts-node": "10.9.2",
+    "typescript": "5.8.3"
   },
   "dev": "concurrently --kill-others \"npm run test1\" \"npm run test2\""
 }
