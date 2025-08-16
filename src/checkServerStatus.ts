@@ -89,18 +89,32 @@ async function handleServerResponse(host: string, port: number, response: any) {
  * Убираем передачу `version` чтобы избежать поиска protocol => null
  */
 function pingAsync(opts: { host: string; port: number; timeout?: number }): Promise<any> {
-  return new Promise((resolve, reject) => {
+  const timeoutMs = opts.timeout ?? 5000;
+  let timer: NodeJS.Timeout | null = null;
+
+  const pingPromise = new Promise<any>((resolve, reject) => {
     try {
-      // mc.ping имеет сигнатуру (opts, cb)
-      mc.ping({ host: opts.host, port: opts.port, timeout: opts.timeout ?? 5000 }, (err: any, res: any) => {
+      // Передадим только host и port (избегаем несуществующих полей в типах)
+      mc.ping({ host: opts.host, port: opts.port } as any, (err: any, res: any) => {
+        if (timer) clearTimeout(timer);
         if (err) return reject(err);
         resolve(res);
       });
     } catch (e) {
+      if (timer) clearTimeout(timer);
       reject(e);
     }
   });
+
+  const timeoutPromise = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      reject(new Error(`mc.ping timeout after ${timeoutMs} ms`));
+    }, timeoutMs);
+  });
+
+  return Promise.race([pingPromise, timeoutPromise]);
 }
+
 
 async function checkServerStatus(host: string, port: number) {
   try {
