@@ -150,6 +150,20 @@ function initializeTgBridge(): void {
     tgBridge.on('error', (err) => {
         logger.error(`Ошибка tgBridge: ${err}`)
     })
+    tgBridge.on('message', (data: WebSocket.RawData) => {
+        try {
+            const event = JSON.parse(data.toString())
+
+            if (event.type === 'chat_from_tg') {
+                // Сообщение из Telegram → отправляем в игровой чат
+                bot.chat(`<${event.author}> ${event.text}`)
+                logger.logEvent(`TG -> MC: <${event.author}> ${event.text}`)
+            }
+        } catch (err) {
+            logger.error(`Ошибка обработки сообщения из tgBridge: ${err}`)
+        }
+    })
+
 
     tgBridge.on('close', () => {
         logger.logEvent(`tgBridge соединение закрыто. Переподключение через 5 сек...`)
