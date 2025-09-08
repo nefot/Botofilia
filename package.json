@@ -11,7 +11,7 @@
     "ZombieMummy": "node dist/main.js ZombieMummy 0303708000 77.235.121.114",
     "build": "tsc",
     "ARTYOM_BETER_": "ts-node src/main.ts ARTYOM_BETER_ 0303708000 77.235.121.114 25565 true",
-    "archive": "ts-node src/main.ts ZombieMummy 0303708000 77.235.121.114 25565 true",
+    "archive": "ts-node src/main.ts Nefotoria 0303708000 birchcraft.hopto.org 25565 true",
     "runscr2ipt": "ts-node src/RunScript.ts",
     "server": "ts-node  src/server.ts ",
     "logCleaner": "ts-node  src/logCleaner.ts ",
