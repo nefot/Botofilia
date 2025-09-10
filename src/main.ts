@@ -156,7 +156,7 @@ function initializeTgBridge(): void {
 
             if (event.type === 'chat_from_tg') {
                 // Сообщение из Telegram → отправляем в игровой чат
-                bot.chat(`${event.text}`)
+                bot.chat(`<${event.author}> ${event.text}`)
                 logger.logEvent(`TG -> MC: <${event.author}> ${event.text}`)
             }
         } catch (err) {
