@@ -23,15 +23,14 @@ const commandHandlers: Record<string, CommandHandler> = {
         bot.chat(message);
 
     },
-
     async inventory(_, logger, bot): Promise<void> {
         console.log('Инвентарь бота: ' + JSON.stringify(bot.inventory.items()));
     },
-
     async online(_, logger, bot): Promise<void> {
         console.log('Игроки онлайн: ' + Object.keys(bot.players).join(', '));
     },
 
+    
     async move(args: string[], logger: Logger, bot: Bot): Promise<void> {
         if (!bot.hasPlugin(pathfinder)) {
             bot.loadPlugin(pathfinder);
@@ -76,8 +75,6 @@ const commandHandlers: Record<string, CommandHandler> = {
         // ---------------------------------------------------------------------
 
     },
-
-
     async health(args, logger, bot): Promise<void> {
         const healthHearts: number = Math.round(bot.health / 2);
         const foodIcons: number = Math.round(bot.food / 2);
@@ -95,7 +92,6 @@ const commandHandlers: Record<string, CommandHandler> = {
             console.log(output);
         }
     },
-
     async say(args, logger, bot): Promise<void> {
         const message = args.join(' ');
 
@@ -107,7 +103,6 @@ const commandHandlers: Record<string, CommandHandler> = {
         bot.chat(message);
 
     },
-
     async exit(_, logger, bot) {
         console.log('Завершение работы бота...');
         bot.end();

@@ -6,7 +6,7 @@ namespace Setting {
   export const filename = 'tt.txt';
   export const names = readNamesFromFile(filename);
   export let scripts: string[] = [];
-  export let host = '77.235.121.114';
+  export let host = 'birchcraft.hopto.org';
   export let password = '0303708000';
   export let port = 25565;
   export let wsPort = 8080;

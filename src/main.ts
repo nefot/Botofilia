@@ -23,6 +23,15 @@ let bot: Bot
 let ws: WebSocket
 let tgBridge: WebSocket // <-- сюда шлём чаты в Телегу
 
+
+function autorizate(){
+
+}
+
+
+
+
+
 function createBotInstance(): void {
     bot = createBot(Settings.botOptions)
 
